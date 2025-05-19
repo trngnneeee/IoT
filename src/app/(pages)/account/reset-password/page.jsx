@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { IoChevronBack } from "react-icons/io5";
-import { GoMail } from "react-icons/go";
 import { CiLock } from "react-icons/ci";
 
 export const metadata = {
-  title: "Login"
+  title: "Reset Password"
 };
 
 export default function Home() {
@@ -27,20 +26,9 @@ export default function Home() {
               </Link>
             </div>
             <form className="mb-[15px]">
-              <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[30px]">
-                <label htmlFor="email">
-                  <GoMail className="text-[18px]" />
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  placeholder="Email"
-                  className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-                />
-              </div>
               <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[20px]">
                 <label htmlFor="password">
-                  <CiLock className="text-[18px]" />
+                  <CiLock className="text-[20px]" />
                 </label>
                 <input
                   type="password"
@@ -49,24 +37,19 @@ export default function Home() {
                   className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
                 />
               </div>
-              <div className="flex justify-between items-center mb-[20px]">
-                <div className="flex items-center gap-[10px]">
-                  <input
-                    type="checkbox"
-                    className="w-[20px] h-[20px]"
-                  />
-                  <label className="text-[14px] font-[500] text-[#505050]">Remember Password</label>
-                </div>
-                <Link href="/account/forgot-password">
-                  <div className="text-[14px] font-[500] text-[#505050] hover:text-[#0040ff]">Forgot Password</div>
-                </Link>
+              <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[20px]">
+                <label htmlFor="password">
+                  <CiLock className="text-[20px]" />
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  placeholder="Confirm Password"
+                  className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
+                />
               </div>
-              <button className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer">Login</button>
+              <button className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer">Reset Password</button>
             </form>
-            <div className="flex items-center gap-[5px] justify-center">
-              <div className="text-[14px] font-[500]">Don't have an account?</div>
-              <Link href="/account/register" className="text-[14px] font-[500] text-[#505050] hover:text-[#0040ff]">Register</Link>
-            </div>
           </div>
         </div>
       </div>

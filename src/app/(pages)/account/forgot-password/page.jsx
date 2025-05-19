@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { IoChevronBack } from "react-icons/io5";
 import { GoMail } from "react-icons/go";
-import { CiLock } from "react-icons/ci";
 
 export const metadata = {
-  title: "Login"
+  title: "Forgot Password"
 };
 
 export default function Home() {
@@ -16,7 +15,7 @@ export default function Home() {
             <img src="/loginAvt.jpg" className="w-full h-full object-cover" />
           </div>
           <div className="w-[60%]">
-            <div className="text-[25px] font-[600] text-center mb-[20px]">Welcome back 👋</div>
+            <div className="text-[25px] font-[600] text-center mb-[20px]">Forgot Password 🔍</div>
             <div className="flex justify-between items-center mb-[30px]">
               <div className="w-[150px] h-auto overflow-hidden">
                 <img src="/logo.jpg" className="w-full h-full object-cover"/>
@@ -38,34 +37,11 @@ export default function Home() {
                   className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
                 />
               </div>
-              <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[20px]">
-                <label htmlFor="password">
-                  <CiLock className="text-[18px]" />
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  placeholder="Password"
-                  className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-                />
-              </div>
-              <div className="flex justify-between items-center mb-[20px]">
-                <div className="flex items-center gap-[10px]">
-                  <input
-                    type="checkbox"
-                    className="w-[20px] h-[20px]"
-                  />
-                  <label className="text-[14px] font-[500] text-[#505050]">Remember Password</label>
-                </div>
-                <Link href="/account/forgot-password">
-                  <div className="text-[14px] font-[500] text-[#505050] hover:text-[#0040ff]">Forgot Password</div>
-                </Link>
-              </div>
-              <button className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer">Login</button>
+              <button className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer">Send OTP</button>
             </form>
             <div className="flex items-center gap-[5px] justify-center">
-              <div className="text-[14px] font-[500]">Don't have an account?</div>
-              <Link href="/account/register" className="text-[14px] font-[500] text-[#505050] hover:text-[#0040ff]">Register</Link>
+              <div className="text-[14px] font-[500]">Already have an account?</div>
+              <Link href="/account/login" className="text-[14px] font-[500] text-[#505050] hover:text-[#0040ff]">Login</Link>
             </div>
           </div>
         </div>
