@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { IoChevronBack } from "react-icons/io5";
-import { GoMail } from "react-icons/go";
-import { CiLock } from "react-icons/ci";
+import { LoginForm } from "./LoginForm"
 
 export const metadata = {
   title: "Login"
@@ -10,7 +9,7 @@ export const metadata = {
 export default function Home() {
   return (
     <>
-      <div className="bg-[#F3F4F6] w-full h-full absolute">
+      <div className="w-full h-full absolute">
         <div className="bg-white w-[1000px] h-auto mx-auto mt-[100px] p-[40px] flex gap-[40px] rounded-[20px] shadow-xl">
           <div className="w-[400px] h-[500px] rounded-[20px] overflow-hidden shadow-xl">
             <img src="/loginAvt.jpg" className="w-full h-full object-cover" />
@@ -26,43 +25,7 @@ export default function Home() {
                 <div className="text-[14px] font-[500]">Return home</div>
               </Link>
             </div>
-            <form className="mb-[15px]">
-              <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[30px]">
-                <label htmlFor="email">
-                  <GoMail className="text-[18px]" />
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  placeholder="Email"
-                  className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-                />
-              </div>
-              <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[20px]">
-                <label htmlFor="password">
-                  <CiLock className="text-[18px]" />
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  placeholder="Password"
-                  className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-                />
-              </div>
-              <div className="flex justify-between items-center mb-[20px]">
-                <div className="flex items-center gap-[10px]">
-                  <input
-                    type="checkbox"
-                    className="w-[20px] h-[20px]"
-                  />
-                  <label className="text-[14px] font-[500] text-[#505050]">Remember Password</label>
-                </div>
-                <Link href="/account/forgot-password">
-                  <div className="text-[14px] font-[500] text-[#505050] hover:text-[#0040ff]">Forgot Password</div>
-                </Link>
-              </div>
-              <button className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer">Login</button>
-            </form>
+            <LoginForm/>
             <div className="flex items-center gap-[5px] justify-center">
               <div className="text-[14px] font-[500]">Don't have an account?</div>
               <Link href="/account/register" className="text-[14px] font-[500] text-[#505050] hover:text-[#0040ff]">Register</Link>
