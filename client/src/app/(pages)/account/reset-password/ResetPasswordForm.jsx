@@ -4,25 +4,8 @@ import { CiLock } from "react-icons/ci";
 import Swal from 'sweetalert2'
 import JustValidate from 'just-validate';
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 
 export const ResetPasswordForm = () => {
-  const router = useRouter();
-  
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/verifyToken`, {
-      method: "POST",
-      credentials: "include"
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.code == "error")
-        {
-          router.push("/account/login");
-        }
-      })
-  }, []);
-
   useEffect(() => {
     const validation = new JustValidate('#reset-password-form');
 
