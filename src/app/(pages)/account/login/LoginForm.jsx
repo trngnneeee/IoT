@@ -51,8 +51,13 @@ export const LoginForm = () => {
         },
       ])
       .onSuccess((event) => {
+        event.preventDefault();
         const email = event.target.email.value;
         const password = event.target.password.value;
+
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Sending...';
 
         const finalData = {
           email: email,
@@ -75,6 +80,11 @@ export const LoginForm = () => {
               timer: 3000
             });
             if(data.code == "success") router.push("/");
+            else
+            {
+              submitBtn.disabled = false;
+              submitBtn.innerText = 'Login';
+            }
           })
       })
   }, [])
@@ -116,7 +126,13 @@ export const LoginForm = () => {
             <div className="text-[14px] font-[500] text-[#505050] hover:text-[#0040ff]">Forgot Password</div>
           </Link>
         </div>
-        <button className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer">Login</button>
+        <button 
+          id="submit-btn"
+          type="submit"
+          className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer"
+        >
+          Login
+        </button>
       </form>
     </>
   );

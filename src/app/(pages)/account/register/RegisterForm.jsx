@@ -90,9 +90,15 @@ export const RegisterForm = () => {
         }
       ])
       .onSuccess((event) => {
+        event.preventDefault();
+
         const fullName = event.target.name.value;
         const email = event.target.email.value;
         const password = event.target.password.value;
+
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Sending...';
 
         const finalData = {
           fullName: fullName,
@@ -114,7 +120,12 @@ export const RegisterForm = () => {
               title: data.message,
               timer: 3000
             });
-            router.push("/account/register-initial");
+            if (data.code == "success") router.push("/account/register-initial");
+            else
+            {
+              submitBtn.disabled = false;
+              submitBtn.innerText = 'Register';
+            }
           })
       })
   }, [])
@@ -166,7 +177,13 @@ export const RegisterForm = () => {
             className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
           />
         </div>
-        <button className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer">Register</button>
+        <button 
+          id="submit-btn"
+          type="submit"
+          className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer"
+        >
+          Register
+        </button>
       </form>
     </>
   );

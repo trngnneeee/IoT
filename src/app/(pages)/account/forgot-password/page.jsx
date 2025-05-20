@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { IoChevronBack } from "react-icons/io5";
-import { GoMail } from "react-icons/go";
+import { ForgotPasswordForm } from "./ForgotPasswordForm"
 
 export const metadata = {
   title: "Forgot Password"
@@ -25,20 +25,7 @@ export default function Home() {
                 <div className="text-[14px] font-[500]">Return home</div>
               </Link>
             </div>
-            <form className="mb-[15px]">
-              <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[30px]">
-                <label htmlFor="email">
-                  <GoMail className="text-[18px]" />
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  placeholder="Email"
-                  className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-                />
-              </div>
-              <button className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer">Send OTP</button>
-            </form>
+            <ForgotPasswordForm/>
             <div className="flex items-center gap-[5px] justify-center">
               <div className="text-[14px] font-[500]">Already have an account?</div>
               <Link href="/account/login" className="text-[14px] font-[500] text-[#505050] hover:text-[#0040ff]">Login</Link>
