@@ -1,40 +1,44 @@
 "use client"
 
-import { GoMail } from "react-icons/go";
+import { TbPasswordFingerprint } from "react-icons/tb";
 import JustValidate from 'just-validate';
 import { useEffect } from "react";
 import Swal from 'sweetalert2'
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export const ForgotPasswordForm = () => {
+export const OTPPasswordForm = () => {
+  const searchParams = useSearchParams();
   const router = useRouter();
   useEffect(() => {
-    const validation = new JustValidate('#forgot-password-form');
+    const validation = new JustValidate('#otp-password-form');
 
     validation
-      .addField('#email', [
+      .addField('#otp', [
         {
           rule: 'required',
           errorMessage: 'Email required!'
         },
-        {
-          rule: 'email',
-          errorMessage: 'Invalid email format!',
-        },
       ])
       .onSuccess((event) => {
         event.preventDefault();
-        const email = event.target.email.value;
+        const otp = event.target.otp.value;
+        const email = searchParams.get("email");
+
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Sending...';
 
         const finalData = {
+          otp: otp,
           email: email
         };
 
-        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/account/forgot-password`, {
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/account/otp-password`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
+          credentials: "include",
           body: JSON.stringify(finalData)
         })
           .then(res => res.json())
@@ -44,10 +48,10 @@ export const ForgotPasswordForm = () => {
               title: data.message,
               timer: 3000
             });
-            if (data.code == "success") router.push(`/account/otp-password?email=${email}`);
+            if (data.code == "success") router.push("/account/reset-password");
             else {
               submitBtn.disabled = false;
-              submitBtn.innerText = 'Send OTP';
+              submitBtn.innerText = 'Verify OTP';
             }
           })
       })
@@ -55,15 +59,15 @@ export const ForgotPasswordForm = () => {
 
   return (
     <>
-      <form className="mb-[15px]" id="forgot-password-form">
+      <form className="mb-[15px]" id="otp-password-form">
         <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[30px]">
-          <label htmlFor="email">
-            <GoMail className="text-[18px]" />
+          <label htmlFor="otp">
+            <TbPasswordFingerprint className="text-[18px]" />
           </label>
           <input
-            type="email"
-            id="email"
-            placeholder="Email"
+            type="text"
+            id="otp"
+            placeholder="OTP Password"
             className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
           />
         </div>
@@ -72,7 +76,7 @@ export const ForgotPasswordForm = () => {
           type="submit"
           className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer"
         >
-          Send OTP
+          Verify OTP
         </button>
       </form>
     </>

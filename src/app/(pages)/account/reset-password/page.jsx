@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { IoChevronBack } from "react-icons/io5";
-import { CiLock } from "react-icons/ci";
+import { ResetPasswordForm } from "./ResetPasswordForm"
 
 export const metadata = {
   title: "Reset Password"
@@ -25,31 +25,7 @@ export default function Home() {
                 <div className="text-[14px] font-[500]">Return home</div>
               </Link>
             </div>
-            <form className="mb-[15px]">
-              <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[20px]">
-                <label htmlFor="password">
-                  <CiLock className="text-[20px]" />
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  placeholder="Password"
-                  className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-                />
-              </div>
-              <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[20px]">
-                <label htmlFor="password">
-                  <CiLock className="text-[20px]" />
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  placeholder="Confirm Password"
-                  className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-                />
-              </div>
-              <button className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer">Reset Password</button>
-            </form>
+            <ResetPasswordForm/>
           </div>
         </div>
       </div>

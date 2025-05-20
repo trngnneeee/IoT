@@ -11,6 +11,11 @@ import { useRouter } from 'next/navigation';
 export const RegisterForm = () => {
   const router = useRouter();
   useEffect(() => {
+    const form = document.getElementById('register-form');
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+    });
+    
     const validation = new JustValidate('#register-form');
 
     validation
