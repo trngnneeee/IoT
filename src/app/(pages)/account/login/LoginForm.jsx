@@ -5,8 +5,11 @@ import { GoMail } from "react-icons/go";
 import { CiLock } from "react-icons/ci";
 import JustValidate from 'just-validate';
 import { useEffect } from "react";
+import Swal from 'sweetalert2'
+import { useRouter } from "next/navigation";
 
 export const LoginForm = () => {
+  const router = useRouter();
   useEffect(() => {
     const validation = new JustValidate('#login-form');
 
@@ -51,8 +54,28 @@ export const LoginForm = () => {
         const email = event.target.email.value;
         const password = event.target.password.value;
 
-        console.log(email);
-        console.log(password);
+        const finalData = {
+          email: email,
+          password: password
+        };
+
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/account/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include",
+          body: JSON.stringify(finalData)
+        })
+          .then(res => res.json())
+          .then(data => {
+            Swal.fire({
+              icon: data.code,
+              title: data.message,
+              timer: 3000
+            });
+            if(data.code == "success") router.push("/");
+          })
       })
   }, [])
 

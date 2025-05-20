@@ -1,12 +1,15 @@
 "use client"
 
+import Swal from 'sweetalert2'
 import JustValidate from 'just-validate';
 import { useEffect } from "react";
 import { GoMail } from "react-icons/go";
 import { CiLock } from "react-icons/ci";
 import { LuUserRound } from "react-icons/lu";
+import { useRouter } from 'next/navigation';
 
 export const RegisterForm = () => {
+  const router = useRouter();
   useEffect(() => {
     const validation = new JustValidate('#register-form');
 
@@ -91,9 +94,28 @@ export const RegisterForm = () => {
         const email = event.target.email.value;
         const password = event.target.password.value;
 
-        console.log(fullName);
-        console.log(email);
-        console.log(password);
+        const finalData = {
+          fullName: fullName,
+          email: email,
+          password: password
+        };
+
+        fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/account/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(finalData)
+        })
+          .then(res => res.json())
+          .then(data => {
+            Swal.fire({
+              icon: data.code,
+              title: data.message,
+              timer: 3000
+            });
+            router.push("/account/register-initial");
+          })
       })
   }, [])
 
