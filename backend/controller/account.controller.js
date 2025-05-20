@@ -112,10 +112,7 @@ module.exports.forgotPasswordPost = async (req, res) => {
     });
     return;
   }
-
   const otp = generateOTPHelper(6);
-
-  console.log(otp);
 
   const newRecord = new ForgotPassword({
     email: req.body.email,
@@ -145,5 +142,69 @@ module.exports.forgotPasswordPost = async (req, res) => {
   res.json({
     code: "success",
     message: "Send OTP successfully!"
+  })
+}
+
+module.exports.otpPasswordPost = async (req, res) => {
+  const existAccountOTP = await ForgotPassword.findOne({
+    email: req.body.email,
+    otp: req.body.otp
+  });
+  if (!existAccountOTP)
+  {
+    res.json({
+      code: "error",
+      message: "Incorrect OTP!"
+    });
+    return;
+  }
+  
+  await ForgotPassword.deleteOne({
+    email: req.body.email,
+    otp: req.body.otp
+  });
+
+  const existAccount = await AdminAccount.findOne({
+    email: req.body.email
+  });
+
+  const token = jwt.sign(
+    {
+      id: existAccount.id,
+      email: existAccount.email
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: '1d'
+    }
+  )
+
+  res.cookie("token", token, {
+    maxAge: 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/"
+  });
+
+  res.json({
+    code: "success",
+    message: "Verify OTP successfully!"
+  });
+}
+
+module.exports.resetPasswordPost = async (req, res) => {
+  const salt = bcrypt.genSaltSync(10);
+  const hashPassword = bcrypt.hashSync(req.body.password, salt);
+
+  await AdminAccount.updateOne({
+    _id: req.account.id
+  }, {
+    password: hashPassword
+  })
+  
+  res.json({
+    code: "success",
+    message: "Reset password successfully!"
   })
 }
