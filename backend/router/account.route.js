@@ -12,4 +12,9 @@ router.post(
   accountController.loginPost
 )
 
+router.post(
+  "/forgot-password",
+  accountController.forgotPasswordPost
+)
+
 module.exports = router;
