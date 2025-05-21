@@ -82,7 +82,8 @@ module.exports.loginPost = (req, res, next) => {
         "password.lowercase": "Password must contain at least one lowercase letter!",
         "password.number": "Password must contain at least one digit!",
         "password.specialChar": "Password must contain at least one special character!"
-      })
+      }),
+      rememberPassword: Joi.boolean().allow("")
   });
 
   const { error } = schema.validate(req.body);

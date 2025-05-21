@@ -12,9 +12,9 @@ This is a fullstack IoT web application built with **Next.js** for the frontend 
 * 🔐 JWT-based Authentication (Login/Register) using [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken)
 * 🗔️ Database integration (MongoDB)
 * 🌐 CORS and environment variable support
-* 📄 Form validation (Client using [Just-validate Lib](https://github.com/horprogs/Just-validate) & Server side)
+* 📄 Form validation (Client using [Just-validate Lib](https://github.com/horprogs/Just-validate) & Server side using [Joi Lib](https://joi.dev/api/?v=17.13.3))
 * 💻 Responsive UI with Tailwind CSS 
-* ✉️ Automatic email sending for OTP Reset password
+* ✉️ Automatic email sending for OTP Reset password using [NodeMailer](https://nodemailer.com/)
 
 ## 🧱 Tech Stack
 

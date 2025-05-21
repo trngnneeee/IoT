@@ -59,6 +59,7 @@ export const LoginForm = () => {
         event.preventDefault();
         const email = event.target.email.value;
         const password = event.target.password.value;
+        const rememberPassword = event.target.rememberPassword.checked;
 
         const submitBtn = document.getElementById('submit-btn');
         submitBtn.disabled = true;
@@ -66,7 +67,8 @@ export const LoginForm = () => {
 
         const finalData = {
           email: email,
-          password: password
+          password: password,
+          rememberPassword: rememberPassword
         };
 
         fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/account/login`, {
@@ -124,8 +126,9 @@ export const LoginForm = () => {
             <input
               type="checkbox"
               className="w-[20px] h-[20px]"
+              id="rememberPassword"
             />
-            <label className="text-[14px] font-[500] text-[#505050]">Remember Password</label>
+            <label className="text-[14px] font-[500] text-[#505050]" htmlFor="rememberPassword">Remember Password</label>
           </div>
           <Link href="/account/forgot-password">
             <div className="text-[14px] font-[500] text-[#505050] hover:text-[#0040ff]">Forgot Password</div>

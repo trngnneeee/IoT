@@ -69,12 +69,12 @@ module.exports.loginPost = async (req, res) => {
     },
     process.env.JWT_SECRET,
     {
-      expiresIn: '1d'
+      expiresIn: req.body.rememberPassword ? '30d' : '1d'
     }
   )
 
   res.cookie("token", token, {
-    maxAge: 24 * 60 * 60 * 1000,
+    maxAge: req.body.rememberPassword ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
