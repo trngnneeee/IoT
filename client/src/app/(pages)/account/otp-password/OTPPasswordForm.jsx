@@ -16,8 +16,13 @@ export const OTPPasswordForm = () => {
       .addField('#otp', [
         {
           rule: 'required',
-          errorMessage: 'Email required!'
+          errorMessage: 'OTP required!'
         },
+        {
+          validator: (value) => /^\d{6}$/.test(value),
+          errorMessage: 'OTP must be exactly 6 digits',
+        }
+
       ])
       .onSuccess((event) => {
         event.preventDefault();
