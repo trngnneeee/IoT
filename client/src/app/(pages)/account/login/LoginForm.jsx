@@ -86,7 +86,7 @@ export const LoginForm = () => {
               title: data.message,
               timer: 3000
             });
-            if(data.code == "success") router.push("/");
+            if(data.code == "success") router.push("/dashboard");
             else
             {
               submitBtn.disabled = false;

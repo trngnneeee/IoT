@@ -1,32 +1,15 @@
-"use client"
-
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Header } from "./components/Home/Header/Header"
+import { Section1 } from "./components/Home/Section1/Section1"
+import { Footer } from "./components/Home/Footer/Footer"
 
 export default function Home() {
-  const [load, setLoad] = useState(false);
-  const router = useRouter();
-  
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/verifyToken`, {
-      method: "POST",
-      credentials: "include"
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.code == "error")
-        {
-          router.push("/account/login");
-        }
-        else setLoad(true);
-      })
-  }, []);
-
   return (
     <>
-      {load && (
-        <h1>Trang chủ</h1>
-      )}
+      <Header />
+      <div className="px-[100px] my-[30px]">
+        <Section1/>
+      </div>
+      <Footer/>
     </>
   );
 }
