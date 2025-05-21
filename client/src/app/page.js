@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <div className="px-[100px] my-[30px]">
+      <div className="p-[100px]">
         <Section1/>
       </div>
       <Footer/>

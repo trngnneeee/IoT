@@ -16,7 +16,7 @@ export const Header = () => {
   
   return (
     <>
-      <div className={`flex justify-between px-[30px] py-[20px] bg-white sticky top-0 transition-shadow duration-300 z-50 ${
+      <div className={`flex justify-between px-[30px] py-[30px] bg-white sticky top-0 transition-shadow duration-300 z-50 rounded-b-[20px] ${
         scrolled ? "shadow-xl" : ""
       }`}>
         <div className="flex items-center gap-[20px]">
