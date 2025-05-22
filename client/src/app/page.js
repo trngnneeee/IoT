@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <div className="p-[100px]">
+      <div className="p-[20px] sm:p-[60px] lg:p-[100px]">
         <Section1/>
         <Section2/>
       </div>
