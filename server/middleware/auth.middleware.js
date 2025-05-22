@@ -16,25 +16,29 @@ module.exports.verifyToken = async (req, res, next) => {
   {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-     const { id, email } = decoded;
+    const { id, email } = decoded;
 
-     const existAccount = await AdminAccount.findOne({
-      _id: id,
-      email: email,
-      status: "active"
-     });
+    const existAccount = await AdminAccount.findOne({
+    _id: id,
+    email: email,
+    status: "active"
+    });
 
-     if (!existAccount)
-     {
-      res.clearCookie("token");
-      res.json({
-        code: "error",
-        message: "Email does not exist in the systems!"
-      });
-      return;
-     }
+    if (!existAccount)
+    {
+    res.clearCookie("token");
+    res.json({
+      code: "error",
+      message: "Email does not exist in the systems!"
+    });
+    return;
+    }
 
-     req.account = existAccount;
+    req.account = existAccount;
+    res.json({
+      code: "success",
+      account: req.account
+    })
   }
   catch(error)
   {

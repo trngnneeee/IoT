@@ -1,12 +1,17 @@
 "use client"
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { HiViewList } from "react-icons/hi";
+import Swal from 'sweetalert2'
 
 export const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false)
+  const [account, setAccount] = useState(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     const handleRolled = () => {
@@ -15,6 +20,38 @@ export const Header = () => {
     window.addEventListener("scroll", handleRolled);
     return () => window.removeEventListener("scroll", handleRolled);
   })
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/verifyToken`, {
+      method: "POST",
+      credentials: "include"
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.code == "error") {
+          router.push("/account/login");
+        }
+        else {
+          setAccount(data.account);
+        }
+      })
+  }, []);
+
+  const handleLogout = () => {
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/account/logout`, {
+      method: "POST",
+      credentials: "include"
+    })
+      .then(res => res.json())
+      .then(data => {
+        Swal.fire({
+          icon: data.code,
+          title: data.message,
+          timer: 3000
+        });
+        if (data.code == "success") router.push("/account/login");
+      })
+  }
 
   return (
     <>
@@ -25,7 +62,7 @@ export const Header = () => {
             <Link href="#" className="text-[10px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] py-[3px] rounded-[8px]">Team</Link>
           </div>
           <div>
-            
+
           </div>
         </div>
       )}
@@ -49,8 +86,15 @@ export const Header = () => {
           <Link href="#" className="hidden sm:block text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[3px] rounded-[8px]">Team</Link>
         </div>
         <div className="flex items-center gap-[10px] sm:gap-[20px]">
-          <Link href="/account/login" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]">Login</Link>
-          <Link href="/account/register" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]">Register</Link>
+          {!account && (
+            <Link href="/account/login" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]">Login</Link>
+          )}
+          {!account && (
+            <Link href="/account/register" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]">Register</Link>
+          )}
+          {account && (
+            <button className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]" onClick={handleLogout}>Logout</button>
+          )}
         </div>
       </div>
     </>

@@ -208,3 +208,11 @@ module.exports.resetPasswordPost = async (req, res) => {
     message: "Reset password successfully!"
   })
 }
+
+module.exports.logoutPost = (req, res) => {
+  res.clearCookie("token");
+  res.json({
+    code: "success",
+    message: "Logout successfully!"
+  })
+}
