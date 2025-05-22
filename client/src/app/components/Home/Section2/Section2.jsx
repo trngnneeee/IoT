@@ -1,7 +1,7 @@
 "use client"
 
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination, Autoplay } from 'swiper/modules';
+import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
@@ -34,28 +34,26 @@ export const Section2 = () => {
         </div>
         <div data-aos="fade-up">
           <Swiper
-          modules={[Pagination, Autoplay]}
+          modules={[Autoplay]}
             slidesPerView={3}
             loop={true}
             autoplay={{ delay: 2000, disableOnInteraction: true }}
-            pagination={{ clickable: true }}
             breakpoints={{
-                576: {
+                500: {
                   slidesPerView: 3,
                   spaceBetween: 20,
                 },
                 320: {
-                  slidesPerView: 2,
-                  spaceBetween: 10,
-                  pagination: false
+                  slidesPerView: 1,
+                  spaceBetween: 20,
                 }
               }}
           >
             {dataSection2.map((item, index) => (
-              <SwiperSlide key={index} className='p-0'>
-                <div className="relative w-[150px] sm:w-[170px] md:w-[190px] lg:w-[250px] xl:w-[400px] h-[auto] overflow-hidden rounded-[20px]">
+              <SwiperSlide key={index}>
+                <div className="relative w-[(100% - 40px)/3] h-[auto] overflow-hidden rounded-[20px]">
                   <img src={item.image} className="w-full h-auto object-cover" />
-                  <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-white text-[12px] md:text-[18px] lg:text-[23px] xl:text-[32px] font-bold bg-black/40">
+                  <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-white text-[15px] lg:text-[23px] xl:text-[32px] font-bold bg-black/40">
                     {item.title}
                   </div>
                 </div>
