@@ -1,6 +1,5 @@
 "use client"
 
-import { GoMail } from "react-icons/go";
 import JustValidate from 'just-validate';
 import { useEffect } from "react";
 import Swal from 'sweetalert2'
@@ -56,24 +55,22 @@ export const ForgotPasswordForm = () => {
   return (
     <>
       <form className="mb-[15px]" id="forgot-password-form">
-        <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[30px]">
-          <label htmlFor="email">
-            <GoMail className="text-[18px]" />
-          </label>
-          <input
-            type="email"
-            id="email"
-            placeholder="Email"
-            className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-          />
+        <label htmlFor="email" className="block mb-[15px] text-[16px] text-[#505050] font-bold">EMAIL <span className="text-[red]">*</span></label>
+        <input
+          type="email"
+          id="email"
+          placeholder="What's your email"
+          className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] mb-[50px] pb-[10px]"
+        />
+        <div className="w-full px-[80px]">
+          <button
+            id="submit-btn"
+            type="submit"
+            className="p-[10px] bg-[#0078a6] hover:bg-[#0077a6d1] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer"
+          >
+            Send OTP
+          </button>
         </div>
-        <button
-          id="submit-btn"
-          type="submit"
-          className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer"
-        >
-          Send OTP
-        </button>
       </form>
     </>
   );

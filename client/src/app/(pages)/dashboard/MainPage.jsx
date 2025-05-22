@@ -25,7 +25,7 @@ export const MainPage = () => {
   return (
     <>  
       {load && (
-        <h1>Dashboard</h1>
+        <></>
       )}
     </>
   );

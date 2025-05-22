@@ -3,9 +3,6 @@
 import Swal from 'sweetalert2'
 import JustValidate from 'just-validate';
 import { useEffect } from "react";
-import { GoMail } from "react-icons/go";
-import { CiLock } from "react-icons/ci";
-import { LuUserRound } from "react-icons/lu";
 import { useRouter } from 'next/navigation';
 
 export const RegisterForm = () => {
@@ -15,7 +12,7 @@ export const RegisterForm = () => {
     form?.addEventListener('submit', (e) => {
       e.preventDefault();
     });
-    
+
     const validation = new JustValidate('#register-form');
 
     validation
@@ -126,8 +123,7 @@ export const RegisterForm = () => {
               timer: 3000
             });
             if (data.code == "success") router.push("/account/register-initial");
-            else
-            {
+            else {
               submitBtn.disabled = false;
               submitBtn.innerText = 'Register';
             }
@@ -137,58 +133,44 @@ export const RegisterForm = () => {
 
   return (
     <>
-      <form className="mb-[15px]" id='register-form'>
-        <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[20px]">
-          <label htmlFor="name">
-            <LuUserRound className="text-[18px]" />
-          </label>
-          <input
-            type="text"
-            id="name"
-            placeholder="Full Name"
-            className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-          />
+      <form className="mb-[15px]" id="register-form">
+        <label htmlFor="name" className="block mb-[15px] text-[16px] text-[#505050] font-bold">FULL NAME <span className="text-[red]">*</span></label>
+        <input
+          type="text"
+          id="name"
+          placeholder="What's your full name"
+          className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] mb-[30px] pb-[10px]"
+        />
+        <label htmlFor="email" className="block mb-[15px] text-[16px] text-[#505050] font-bold">EMAIL <span className="text-[red]">*</span></label>
+        <input
+          type="email"
+          id="email"
+          placeholder="What's your email"
+          className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] mb-[30px] pb-[10px]"
+        />
+        <label htmlFor="password" className="block mb-[15px] text-[16px] text-[#505050] font-bold">PASSWORD <span className="text-[red]">*</span></label>
+        <input
+          type="password"
+          id="password"
+          placeholder="What's your password"
+          className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] mb-[30px] pb-[10px]"
+        />
+        <label htmlFor="confirm-password" className="block mb-[15px] text-[16px] text-[#505050] font-bold">CONFIRM PASSWORD <span className="text-[red]">*</span></label>
+        <input
+          type="password"
+          id="confirm-password"
+          placeholder="What's your password"
+          className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] mb-[30px] pb-[10px]"
+        />
+        <div className="w-full px-[80px]">
+          <button
+            id="submit-btn"
+            type="submit"
+            className="p-[10px] bg-[#0078a6] hover:bg-[#0077a6d1] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer"
+          >
+            Register
+          </button>
         </div>
-        <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[20px]">
-          <label htmlFor="email">
-            <GoMail className="text-[18px]" />
-          </label>
-          <input
-            type="email"
-            id="email"
-            placeholder="Email"
-            className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-          />
-        </div>
-        <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[20px]">
-          <label htmlFor="password">
-            <CiLock className="text-[20px]" />
-          </label>
-          <input
-            type="password"
-            id="password"
-            placeholder="Password"
-            className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-          />
-        </div>
-        <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[20px]">
-          <label htmlFor="confirm-password">
-            <CiLock className="text-[20px]" />
-          </label>
-          <input
-            type="password"
-            id="confirm-password"
-            placeholder="Confirm Password"
-            className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-          />
-        </div>
-        <button 
-          id="submit-btn"
-          type="submit"
-          className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer"
-        >
-          Register
-        </button>
       </form>
     </>
   );

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { IoChevronBack } from "react-icons/io5";
 import { LoginForm } from "./LoginForm"
 
 export const metadata = {
@@ -9,27 +8,19 @@ export const metadata = {
 export default function Home() {
   return (
     <>
-      <div className="w-full h-full absolute">
-        <div className="bg-white w-[1000px] h-auto mx-auto mt-[100px] p-[40px] flex gap-[40px] rounded-[20px] shadow-xl">
-          <div className="w-[400px] h-[500px] rounded-[20px] overflow-hidden shadow-xl">
-            <img src="/loginAvt.jpg" className="w-full h-full object-cover" />
+      <div className="bg-[url('/login.png')] h-screen bg-cover bg-center bg-no-repeat">
+        <div className="flex justify-between gap-[400px] px-[150px] pt-[100px]">
+          <div className="">
+            <div className="text-[45px] text-white font-bold">Group</div>
+            <div className="text-[40px] text-white font-bold">Product's Name</div>
           </div>
-          <div className="w-[60%]">
-            <div className="text-[25px] font-[600] text-center mb-[20px]">Welcome back 👋</div>
-            <div className="flex justify-between items-center mb-[30px]">
-              <div className="w-[150px] h-auto overflow-hidden">
-                <img src="/logo.jpg" className="w-full h-full object-cover"/>
+          <div className="w-[650px] bg-white px-[70px] py-[80px] rounded-[20px] shadow-2xl">
+              <div className="text-[#505050] font-semibold text-[36px] mb-[50px]">LOGIN</div>
+              <LoginForm/>
+              <div className="mt-[50px] flex justify-center items-center gap-[5px]">
+                <div className="text-[16px] text-[#505050]">You don't have an account?</div>
+                <Link className="text-[16px] text-[#0040ff] underline" href="/account/register">Sign in</Link>
               </div>
-              <Link href="/" className="flex gap-[5px] items-center hover:text-[#0040ff]">
-                <IoChevronBack className="w-[14px]" />
-                <div className="text-[14px] font-[500]">Return home</div>
-              </Link>
-            </div>
-            <LoginForm/>
-            <div className="flex items-center gap-[5px] justify-center">
-              <div className="text-[14px] font-[500]">Don't have an account?</div>
-              <Link href="/account/register" className="text-[14px] font-[500] text-[#505050] hover:text-[#0040ff]">Register</Link>
-            </div>
           </div>
         </div>
       </div>

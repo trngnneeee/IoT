@@ -1,11 +1,13 @@
 "use client"
 
-import { CiLock } from "react-icons/ci";
 import Swal from 'sweetalert2'
 import JustValidate from 'just-validate';
 import { useEffect } from "react";
+import { useRouter } from 'next/navigation';
 
 export const ResetPasswordForm = () => {
+  const router = useRouter();
+  
   useEffect(() => {
     const validation = new JustValidate('#reset-password-form');
 
@@ -97,7 +99,7 @@ export const ResetPasswordForm = () => {
               title: data.message,
               timer: 3000
             });
-            if (data.code == "success") router.push("/");
+            if (data.code == "success") router.push("/dashboard");
             else {
               submitBtn.disabled = false;
               submitBtn.innerText = 'Register';
@@ -110,35 +112,29 @@ export const ResetPasswordForm = () => {
   return (
     <>
       <form className="mb-[15px]" id="reset-password-form">
-        <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[20px]">
-          <label htmlFor="password">
-            <CiLock className="text-[20px]" />
-          </label>
-          <input
-            type="password"
-            id="password"
-            placeholder="Password"
-            className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-          />
+        <label htmlFor="password" className="block mb-[15px] text-[16px] text-[#505050] font-bold">PASSWORD <span className="text-[red]">*</span></label>
+        <input
+          type="password"
+          id="password"
+          placeholder="What's your password"
+          className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] mb-[30px] pb-[10px]"
+        />
+        <label htmlFor="confirm-password" className="block mb-[15px] text-[16px] text-[#505050] font-bold">PASSWORD <span className="text-[red]">*</span></label>
+        <input
+          type="password"
+          id="confirm-password"
+          placeholder="What's your password"
+          className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] mb-[50px] pb-[10px]"
+        />
+        <div className="w-full px-[80px]">
+          <button
+            id="submit-btn"
+            type="submit"
+            className="p-[10px] bg-[#0078a6] hover:bg-[#0077a6d1] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer"
+          >
+            Reset Password
+          </button>
         </div>
-        <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[20px]">
-          <label htmlFor="confirm-password">
-            <CiLock className="text-[20px]" />
-          </label>
-          <input
-            type="password"
-            id="confirm-password"
-            placeholder="Confirm Password"
-            className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-          />
-        </div>
-        <button 
-          id="submit-btn"
-          type="submit"
-          className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer"
-        >
-          Reset Password
-        </button>
       </form>
     </>
   );

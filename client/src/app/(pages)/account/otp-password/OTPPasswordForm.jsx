@@ -1,6 +1,5 @@
 "use client"
 
-import { TbPasswordFingerprint } from "react-icons/tb";
 import JustValidate from 'just-validate';
 import { useEffect } from "react";
 import Swal from 'sweetalert2'
@@ -65,24 +64,22 @@ export const OTPPasswordForm = () => {
   return (
     <>
       <form className="mb-[15px]" id="otp-password-form">
-        <div className="border-[1px] border-[#dddd] rounded-[8px] p-[10px] flex gap-[20px] items-center shadow-lg mb-[30px]">
-          <label htmlFor="otp">
-            <TbPasswordFingerprint className="text-[18px]" />
-          </label>
-          <input
-            type="text"
-            id="otp"
-            placeholder="OTP Password"
-            className="flex-1 w-full h-full border-none outline-none text-[#505050] text-[14px] font-[400]"
-          />
+        <label htmlFor="otp" className="block mb-[15px] text-[16px] text-[#505050] font-bold">OTP <span className="text-[red]">*</span></label>
+        <input
+          type="text"
+          id="otp"
+          placeholder="What's your OTP"
+          className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] mb-[50px] pb-[10px]"
+        />
+        <div className="w-full px-[80px]">
+          <button
+            id="submit-btn"
+            type="submit"
+            className="p-[10px] bg-[#0078a6] hover:bg-[#0077a6d1] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer"
+          >
+            Verify OTP
+          </button>
         </div>
-        <button
-          id="submit-btn"
-          type="submit"
-          className="p-[10px] bg-[black] hover:bg-[#000000ae] rounded-[8px] text-[14px] font-[600] text-white w-full cursor-pointer"
-        >
-          Verify OTP
-        </button>
       </form>
     </>
   );
