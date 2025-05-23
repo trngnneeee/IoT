@@ -96,20 +96,24 @@ export const LoginForm = () => {
   return (
     <>
       <form className="mb-[15px]" id="login-form">
-        <label htmlFor="email" className="block mb-[15px] text-[16px] text-[#505050] font-bold">EMAIL <span className="text-[red]">*</span></label>
-        <input
-          type="email"
-          id="email"
-          placeholder="What's your email"
-          className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] mb-[30px] pb-[10px]"
-        />
-        <label htmlFor="password" className="block mb-[15px] text-[16px] text-[#505050] font-bold">PASSWORD <span className="text-[red]">*</span></label>
-        <input
-          type="password"
-          id="password"
-          placeholder="What's your password"
-          className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] mb-[30px] pb-[10px]"
-        />
+        <div className="mb-[30px]">
+          <label htmlFor="email" className="block mb-[15px] text-[16px] text-[#505050] font-bold">EMAIL <span className="text-[red]">*</span></label>
+          <input
+            type="email"
+            id="email"
+            placeholder="What's your email"
+            className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] pb-[10px]"
+          />
+        </div>
+        <div className="mb-[30px]">
+          <label htmlFor="password" className="block mb-[15px] text-[16px] text-[#505050] font-bold">PASSWORD <span className="text-[red]">*</span></label>
+          <input
+            type="password"
+            id="password"
+            placeholder="What's your password"
+            className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] pb-[10px]"
+          />
+        </div>
         <div className="flex justify-between items-center mb-[40px]">
           <div className="flex items-center gap-[5px]">
             <input

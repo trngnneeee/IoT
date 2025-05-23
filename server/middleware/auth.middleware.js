@@ -35,10 +35,6 @@ module.exports.verifyToken = async (req, res, next) => {
     }
 
     req.account = existAccount;
-    res.json({
-      code: "success",
-      account: req.account
-    })
   }
   catch(error)
   {

@@ -29,7 +29,7 @@ export const MainPage = () => {
     <>
       {load && (
         <div className="bg-[url('/login.png')] h-screen bg-cover bg-center bg-no-repeat">
-          <div className="flex justify-between gap-[400px] px-[150px] pt-[100px]">
+          <div className="flex justify-between gap-[400px] px-[150px] pt-[80px]">
             <div className="">
               <div className="text-[45px] text-white font-bold">Group</div>
               <div className="text-[40px] text-white font-bold">Product's Name</div>

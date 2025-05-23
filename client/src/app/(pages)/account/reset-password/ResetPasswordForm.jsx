@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 
 export const ResetPasswordForm = () => {
   const router = useRouter();
-  
+
   useEffect(() => {
     const validation = new JustValidate('#reset-password-form');
 
@@ -112,20 +112,24 @@ export const ResetPasswordForm = () => {
   return (
     <>
       <form className="mb-[15px]" id="reset-password-form">
-        <label htmlFor="password" className="block mb-[15px] text-[16px] text-[#505050] font-bold">PASSWORD <span className="text-[red]">*</span></label>
-        <input
-          type="password"
-          id="password"
-          placeholder="What's your password"
-          className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] mb-[30px] pb-[10px]"
-        />
-        <label htmlFor="confirm-password" className="block mb-[15px] text-[16px] text-[#505050] font-bold">PASSWORD <span className="text-[red]">*</span></label>
-        <input
-          type="password"
-          id="confirm-password"
-          placeholder="What's your password"
-          className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] mb-[50px] pb-[10px]"
-        />
+        <div className='mb-[30px]'>
+          <label htmlFor="password" className="block mb-[15px] text-[16px] text-[#505050] font-bold">PASSWORD <span className="text-[red]">*</span></label>
+          <input
+            type="password"
+            id="password"
+            placeholder="What's your password"
+            className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] pb-[10px]"
+          />
+        </div>
+        <div className='mb-[50px]'>
+          <label htmlFor="confirm-password" className="block mb-[15px] text-[16px] text-[#505050] font-bold">PASSWORD <span className="text-[red]">*</span></label>
+          <input
+            type="password"
+            id="confirm-password"
+            placeholder="What's your password"
+            className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] pb-[10px]"
+          />
+        </div>
         <div className="w-full px-[80px]">
           <button
             id="submit-btn"

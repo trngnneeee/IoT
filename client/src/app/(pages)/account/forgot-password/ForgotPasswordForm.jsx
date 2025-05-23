@@ -55,13 +55,15 @@ export const ForgotPasswordForm = () => {
   return (
     <>
       <form className="mb-[15px]" id="forgot-password-form">
-        <label htmlFor="email" className="block mb-[15px] text-[16px] text-[#505050] font-bold">EMAIL <span className="text-[red]">*</span></label>
-        <input
-          type="email"
-          id="email"
-          placeholder="What's your email"
-          className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] mb-[50px] pb-[10px]"
-        />
+        <div className='mb-[50px]'>
+          <label htmlFor="email" className="block mb-[15px] text-[16px] text-[#505050] font-bold">EMAIL <span className="text-[red]">*</span></label>
+          <input
+            type="email"
+            id="email"
+            placeholder="What's your email"
+            className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] pb-[10px]"
+          />
+        </div>
         <div className="w-full px-[80px]">
           <button
             id="submit-btn"
