@@ -57,12 +57,12 @@ export const Header = () => {
     <>
       {open && (
         <div className="w-[120px] h-dvh bg-[#e0f2f5] fixed z-100 py-[20px] px-[5px]">
+          <div className="w-full h-auto px-[10px] mb-[30px]">
+            <img src="logo.jpg" />
+          </div>
           <div className="flex flex-col gap-[5px] border-b-[1px] border-b-[#cecbcb] pb-[20px]">
             <Link href="#" className="text-[10px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] py-[3px] rounded-[8px]">Product</Link>
             <Link href="#" className="text-[10px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] py-[3px] rounded-[8px]">Team</Link>
-          </div>
-          <div>
-
           </div>
         </div>
       )}
@@ -93,7 +93,10 @@ export const Header = () => {
             <Link href="/account/register" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]">Register</Link>
           )}
           {account && (
-            <button className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]" onClick={handleLogout}>Logout</button>
+            <Link href="/dashboard" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]">Dashboard</Link>
+          )}
+          {account && (
+            <button className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] sm:px-[20px] py-[3px] rounded-[8px] cursor-pointer" onClick={handleLogout}>Logout</button>
           )}
         </div>
       </div>
