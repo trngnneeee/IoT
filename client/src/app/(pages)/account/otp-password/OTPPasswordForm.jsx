@@ -64,16 +64,16 @@ export const OTPPasswordForm = () => {
   return (
     <>
       <form className="mb-[15px]" id="otp-password-form">
-        <div className='mb-[50px]'>
-          <label htmlFor="otp" className="block mb-[15px] text-[16px] text-[#505050] font-bold">OTP <span className="text-[red]">*</span></label>
+        <div className='mb-[30px] sm:mb-[50px]'>
+          <label htmlFor="otp" className="block mb-[8px] sm:mb-[15px] text-[14px] sm:text-[16px] text-[#505050] font-bold">OTP <span className="text-[red]">*</span></label>
           <input
             type="text"
             id="otp"
             placeholder="What's your OTP"
-            className="w-full h-full outline-none text-[#505050] text-[14px] font-[400] border-b-[1px] border-b-[#ddd] pb-[10px]"
+            className="w-full h-full outline-none text-[#505050] text-[12px] sm:text-[14px] font-[400] border-b-[1px] border-b-[#ddd] pb-[10px]"
           />
         </div>
-        <div className="w-full px-[80px]">
+        <div className="w-full px-0 sm:px-[80px]">
           <button
             id="submit-btn"
             type="submit"

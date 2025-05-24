@@ -10,6 +10,7 @@ export const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false)
   const [account, setAccount] = useState(null);
+  const [load, setLoad] = useState(false);
 
   const router = useRouter();
 
@@ -29,12 +30,13 @@ export const Header = () => {
       .then(res => res.json())
       .then(data => {
         if (data.code == "error") {
-          router.push("/account/login");
+          // router.push("/account/login");
         }
         else {
           setAccount(data.account);
         }
       })
+      .finally(setLoad(true));
   }, []);
 
   const handleLogout = () => {
@@ -73,33 +75,35 @@ export const Header = () => {
         ></div>
       )}
 
-      <div className={`flex justify-between items-center px-[30px] py-[20px] lg:py-[30px] bg-white sticky top-0 transition-shadow duration-300 z-50 rounded-b-[20px] ${scrolled ? "shadow-xl" : ""
-        }`}>
-        <div className="block sm:hidden cursor-pointer" onClick={() => { setOpen(true) }}>
-          <HiViewList className="text-[15px]" />
+      {load && (
+        <div className={`flex justify-between items-center px-[30px] py-[20px] lg:py-[30px] bg-white sticky top-0 transition-shadow duration-300 z-50 rounded-b-[20px] ${scrolled ? "shadow-xl" : ""
+          }`}>
+          <div className="block sm:hidden cursor-pointer" onClick={() => { setOpen(true) }}>
+            <HiViewList className="text-[15px]" />
+          </div>
+          <div className="flex items-center gap-[20px]">
+            <Link href="/" className="w-[80px] sm:w-[100px] lg:w-[120px] h-auto">
+              <img className="w-full h-full object-cover" src="/logo.jpg" />
+            </Link>
+            <Link href="#" className="hidden sm:block text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[3px] rounded-[8px]">Product</Link>
+            <Link href="#" className="hidden sm:block text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[3px] rounded-[8px]">Team</Link>
+          </div>
+          <div className="flex items-center gap-[10px] sm:gap-[20px]">
+            {!account && (
+              <Link href="/account/login" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]">Login</Link>
+            )}
+            {!account && (
+              <Link href="/account/register" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]">Register</Link>
+            )}
+            {account && (
+              <Link href="/dashboard" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]">Dashboard</Link>
+            )}
+            {account && (
+              <button className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] sm:px-[20px] py-[3px] rounded-[8px] cursor-pointer" onClick={handleLogout}>Logout</button>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-[20px]">
-          <Link href="/" className="w-[80px] sm:w-[100px] lg:w-[120px] h-auto">
-            <img className="w-full h-full object-cover" src="/logo.jpg" />
-          </Link>
-          <Link href="#" className="hidden sm:block text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[3px] rounded-[8px]">Product</Link>
-          <Link href="#" className="hidden sm:block text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[3px] rounded-[8px]">Team</Link>
-        </div>
-        <div className="flex items-center gap-[10px] sm:gap-[20px]">
-          {!account && (
-            <Link href="/account/login" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]">Login</Link>
-          )}
-          {!account && (
-            <Link href="/account/register" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]">Register</Link>
-          )}
-          {account && (
-            <Link href="/dashboard" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]">Dashboard</Link>
-          )}
-          {account && (
-            <button className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] sm:px-[20px] py-[3px] rounded-[8px] cursor-pointer" onClick={handleLogout}>Logout</button>
-          )}
-        </div>
-      </div>
+      )}
     </>
   );
 }
