@@ -37,8 +37,8 @@ export const MainPage = () => {
               <div className="text-[#505050] font-semibold text-[16px] sm:text-[36px] mb-[30px] sm:mb-[50px] text-center">REGISTER SUCCESSFULLY</div>
               <div className="text-[14px] sm:text-[20px] text-[#505050] text-center w-full">Account is being approved!</div>
               <div className="mt-[30px] sm:mt-[50px] flex justify-center items-center gap-[5px]">
-                <div className="text-[10px] sm:text-[16px] text-[#505050]">You don't have an account?</div>
-                <Link className="text-[10px] sm:text-[16px] text-[#0040ff] underline" href="/account/register">Sign in</Link>
+                <div className="text-[10px] sm:text-[16px] text-[#505050]">Already have an account?</div>
+                <Link className="text-[10px] sm:text-[16px] text-[#0040ff] underline" href="/account/login">Login</Link>
               </div>
             </div>
           </div>
