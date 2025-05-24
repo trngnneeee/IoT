@@ -2,10 +2,18 @@
 
 import Swal from 'sweetalert2'
 import JustValidate from 'just-validate';
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from 'next/navigation';
+import { FaRegEye } from "react-icons/fa";
+import { FaRegEyeSlash } from "react-icons/fa";
 
 export const RegisterForm = () => {
+  const [viewPass, setViewPass] = useState(false);
+  const [viewConfirmPass, setViewConfirmPass] = useState(false);
+
+  const passwordErrorContainerRef = useRef(null);
+  const confirmPasswordErrorContainerRef = useRef(null);
+
   const router = useRouter();
   useEffect(() => {
     const form = document.getElementById('register-form');
@@ -57,7 +65,9 @@ export const RegisterForm = () => {
           validator: (value) => /[@$!%*?&]/.test(value),
           errorMessage: 'Password must contain at least one special character!',
         }
-      ])
+      ], {
+        errorsContainer: passwordErrorContainerRef.current
+      })
       .addField('#confirm-password', [
         {
           rule: 'required',
@@ -90,7 +100,9 @@ export const RegisterForm = () => {
           },
           errorMessage: 'Password does not match!',
         }
-      ])
+      ], {
+        errorsContainer: confirmPasswordErrorContainerRef.current
+      })
       .onSuccess((event) => {
         event.preventDefault();
 
@@ -131,6 +143,16 @@ export const RegisterForm = () => {
       })
   }, [])
 
+  const handleViewPassword = (event) => {
+    event.preventDefault();
+    setViewPass(!viewPass);
+  }
+
+  const handleViewConfirmPassword = (event) => {
+    event.preventDefault();
+    setViewConfirmPass(!viewConfirmPass);
+  }
+
   return (
     <>
       <form className="mb-[15px]" id="register-form">
@@ -154,21 +176,43 @@ export const RegisterForm = () => {
         </div>
         <div className='mb-[30px]'>
           <label htmlFor="password" className="block mb-[8px] sm:mb-[15px] text-[14px] sm:text-[16px] text-[#505050] font-bold">PASSWORD <span className="text-[red]">*</span></label>
-          <input
-            type="password"
-            id="password"
-            placeholder="What's your password"
-            className="w-full h-full outline-none text-[#505050] text-[12px] sm:text-[14px] font-[400] border-b-[1px] border-b-[#ddd] pb-[10px]"
-          />
+          <div className="flex items-center justify-between border-b-[1px] border-b-[#ddd] gap-[20px]">
+            <input
+              type={viewPass ? "text" : "password"}
+              id="password"
+              placeholder="What's your password"
+              className="w-full h-full outline-none text-[#505050] text-[12px] sm:text-[14px] font-[400] pb-[10px] flex-1"
+            />
+            <button onClick={handleViewPassword} className="cursor-pointer">
+              {!viewPass && (
+                <FaRegEye className="text-[20px]" />
+              )}
+              {viewPass && (
+                <FaRegEyeSlash className="text-[20px]" />
+              )}
+            </button>
+          </div>
+          <div ref={passwordErrorContainerRef}></div>
         </div>
         <div className='mb-[30px]'>
-          <label htmlFor="confirm-password" className="block mb-[8px] sm:mb-[15px] text-[14px] sm:text-[16px] text-[#505050] font-bold">CONFIRM PASSWORD <span className="text-[red]">*</span></label>
-          <input
-            type="password"
-            id="confirm-password"
-            placeholder="What's your password"
-            className="w-full h-full outline-none text-[#505050] text-[12px] sm:text-[14px] font-[400] border-b-[1px] border-b-[#ddd] pb-[10px]"
-          />
+          <label htmlFor="confirm-password" className="block mb-[8px] sm:mb-[15px] text-[14px] sm:text-[16px] text-[#505050] font-bold">PASSWORD <span className="text-[red]">*</span></label>
+          <div className="flex items-center justify-between border-b-[1px] border-b-[#ddd] gap-[20px]">
+            <input
+              type={viewConfirmPass ? "text" : "password"}
+              id="confirm-password"
+              placeholder="What's your password"
+              className="w-full h-full outline-none text-[#505050] text-[12px] sm:text-[14px] font-[400] pb-[10px] flex-1"
+            />
+            <button onClick={handleViewConfirmPassword} className="cursor-pointer">
+              {!viewConfirmPass && (
+                <FaRegEye className="text-[20px]" />
+              )}
+              {viewConfirmPass && (
+                <FaRegEyeSlash className="text-[20px]" />
+              )}
+            </button>
+          </div>
+          <div ref={confirmPasswordErrorContainerRef}></div>
         </div>
         <div className="w-full px-0 sm:px-[80px]">
           <button

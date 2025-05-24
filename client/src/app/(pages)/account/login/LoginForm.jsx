@@ -2,12 +2,17 @@
 
 import Link from "next/link";
 import JustValidate from 'just-validate';
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Swal from 'sweetalert2'
 import { useRouter } from "next/navigation";
+import { FaRegEye } from "react-icons/fa";
+import { FaRegEyeSlash } from "react-icons/fa";
 
 export const LoginForm = () => {
+  const [viewPass, setViewPass] = useState(false);
+  const passwordErrorContainerRef = useRef(null);
   const router = useRouter();
+  
   useEffect(() => {
     const form = document.getElementById('login-form');
     form?.addEventListener('submit', (e) => {
@@ -52,7 +57,9 @@ export const LoginForm = () => {
           validator: (value) => /[@$!%*?&]/.test(value),
           errorMessage: 'Password must contain at least one special character!',
         },
-      ])
+      ], {
+        errorsContainer: passwordErrorContainerRef.current
+      })
       .onSuccess((event) => {
         event.preventDefault();
         const email = event.target.email.value;
@@ -93,6 +100,11 @@ export const LoginForm = () => {
       })
   }, [])
 
+  const handleViewPassword = (event) => {
+    event.preventDefault();
+    setViewPass(!viewPass);
+  }
+
   return (
     <>
       <form className="mb-[15px]" id="login-form">
@@ -107,12 +119,23 @@ export const LoginForm = () => {
         </div>
         <div className="mb-[30px]">
           <label htmlFor="password" className="block mb-[8px] sm:mb-[15px] text-[14px] sm:text-[16px] text-[#505050] font-bold">PASSWORD <span className="text-[red]">*</span></label>
-          <input
-            type="password"
-            id="password"
-            placeholder="What's your password"
-            className="w-full h-full outline-none text-[#505050] text-[12px] sm:text-[14px] font-[400] border-b-[1px] border-b-[#ddd] pb-[10px]"
-          />
+          <div className="flex items-center justify-between border-b-[1px] border-b-[#ddd] gap-[20px]">
+            <input
+              type={viewPass ? "text" : "password"}
+              id="password"
+              placeholder="What's your password"
+              className="w-full h-full outline-none text-[#505050] text-[12px] sm:text-[14px] font-[400] pb-[10px] flex-1"
+            />
+            <button onClick={handleViewPassword} className="cursor-pointer">
+              {!viewPass && (
+                <FaRegEye className="text-[20px]" />
+              )}
+              {viewPass && (
+                <FaRegEyeSlash className="text-[20px]" />
+              )}
+            </button>
+          </div>
+          <div ref={passwordErrorContainerRef}></div>
         </div>
         <div className="flex justify-between items-center mb-[20px] sm:mb-[40px]">
           <div className="flex items-center gap-[5px]">
