@@ -30,8 +30,8 @@ This is a fullstack IoT web application built with **Next.js** for the frontend 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/trngnneeee/IoT-Web
+cd IoT-Web
 ```
 
 ### 2. Install Dependencies
