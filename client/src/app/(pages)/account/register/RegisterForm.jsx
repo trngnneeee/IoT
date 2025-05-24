@@ -183,14 +183,14 @@ export const RegisterForm = () => {
               placeholder="What's your password"
               className="w-full h-full outline-none text-[#505050] text-[12px] sm:text-[14px] font-[400] pb-[10px] flex-1"
             />
-            <button onClick={handleViewPassword} className="cursor-pointer">
+            <div onClick={handleViewPassword} className="cursor-pointer">
               {!viewPass && (
                 <FaRegEye className="text-[20px]" />
               )}
               {viewPass && (
                 <FaRegEyeSlash className="text-[20px]" />
               )}
-            </button>
+            </div>
           </div>
           <div ref={passwordErrorContainerRef}></div>
         </div>
@@ -203,14 +203,14 @@ export const RegisterForm = () => {
               placeholder="What's your password"
               className="w-full h-full outline-none text-[#505050] text-[12px] sm:text-[14px] font-[400] pb-[10px] flex-1"
             />
-            <button onClick={handleViewConfirmPassword} className="cursor-pointer">
+            <div onClick={handleViewConfirmPassword} className="cursor-pointer">
               {!viewConfirmPass && (
                 <FaRegEye className="text-[20px]" />
               )}
               {viewConfirmPass && (
                 <FaRegEyeSlash className="text-[20px]" />
               )}
-            </button>
+            </div>
           </div>
           <div ref={confirmPasswordErrorContainerRef}></div>
         </div>

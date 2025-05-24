@@ -7,7 +7,7 @@ export const Footer = () => {
         <div className="border-b-[1px] border-b-[#ddd]">
           <div className="flex flex-col sm:flex-row justify-between items-center pb-[30px]">
             <div className="text-[12px] lg:text-[14px] font-[300] text-[#505050] mb-[20px] sm:mb-0">
-              © 2023 IoT Systems. All rights reserved.
+              © 2025 IoT Systems. All rights reserved.
             </div>
             <Link href="/" className="w-[120px] sm:w-[150px] lg:w-[200px] h-auto mb-[20px]">
               <img src="/logo.jpg" className="w-full h-full object-cover" />
