@@ -64,7 +64,7 @@ export const Header = () => {
           </div>
           <div className="flex flex-col gap-[5px] border-b-[1px] border-b-[#cecbcb] pb-[20px]">
             <Link href="#" className="text-[10px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] py-[3px] rounded-[8px]">Product</Link>
-            <Link href="#" className="text-[10px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] py-[3px] rounded-[8px]">Team</Link>
+            <Link href="/team" className="text-[10px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] py-[3px] rounded-[8px]">Team</Link>
           </div>
         </div>
       )}
@@ -86,7 +86,7 @@ export const Header = () => {
               <img className="w-full h-full object-cover" src="/logo.jpg" />
             </Link>
             <Link href="#" className="hidden sm:block text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[3px] rounded-[8px]">Product</Link>
-            <Link href="#" className="hidden sm:block text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[3px] rounded-[8px]">Team</Link>
+            <Link href="/team" className="hidden sm:block text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[3px] rounded-[8px]">Team</Link>
           </div>
           <div className="flex items-center gap-[10px] sm:gap-[20px]">
             {!account && (

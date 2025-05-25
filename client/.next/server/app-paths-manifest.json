@@ -1,9 +1,6 @@
 {
-  "/page": "app/page.js",
   "/(pages)/account/login/page": "app/(pages)/account/login/page.js",
+  "/(pages)/team/page": "app/(pages)/team/page.js",
   "/(pages)/dashboard/page": "app/(pages)/dashboard/page.js",
-  "/(pages)/account/reset-password/page": "app/(pages)/account/reset-password/page.js",
-  "/(pages)/account/forgot-password/page": "app/(pages)/account/forgot-password/page.js",
-  "/(pages)/account/register/page": "app/(pages)/account/register/page.js",
-  "/(pages)/account/otp-password/page": "app/(pages)/account/otp-password/page.js"
+  "/page": "app/page.js"
 }
