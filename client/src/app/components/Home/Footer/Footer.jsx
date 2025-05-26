@@ -9,14 +9,19 @@ export const Footer = () => {
             <div className="text-[12px] lg:text-[14px] font-[300] text-[#505050] mb-[20px] sm:mb-0">
               © 2025 IoT Systems. All rights reserved.
             </div>
-            <Link href="/" className="w-[120px] sm:w-[150px] lg:w-[200px] h-auto mb-[20px]">
-              <img src="/logo.jpg" className="w-full h-full object-cover" />
+            <Link href="/">
+              <img
+                src="/logo.jpg"
+                alt="Home"
+                title="Home"
+                className="w-[120px] sm:w-[150px] lg:w-[200px] h-auto mb-[20px] object-cover"
+              />
             </Link>
             <div>
 
-              <Link href="#" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">Product</Link>
-              <Link href="/team" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">Team</Link>
-              <Link href="/contact" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">Contact</Link>
+              <Link title="Product" href="#" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">Product</Link>
+              <Link title="Team" href="/team" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">Team</Link>
+              <Link title="Contact" href="/contact" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">Contact</Link>
             </div>
           </div>
         </div>
@@ -26,8 +31,8 @@ export const Footer = () => {
             <div className="text-[8px] sm:text-[12px] lg:text-[14px] font-[300] text-[#505050]">This open source can be found at <a href="https://github.com/trngnneeee/IoT-Web" target="blank" className="text-[8px] sm:text-[12px] lg:text-[14px] font-[600] underline">IoT Website</a></div>
           </div>
           <div>
-            <Link href="#" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">Privacy</Link>
-            <Link href="#" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">License</Link>
+            <Link title="Privacy" href="#" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">Privacy</Link>
+            <Link title="License" href="#" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">License</Link>
           </div>
         </div>
       </div>
