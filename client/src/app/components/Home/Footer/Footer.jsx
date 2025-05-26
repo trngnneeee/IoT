@@ -15,8 +15,8 @@ export const Footer = () => {
             <div>
 
               <Link href="#" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">Product</Link>
-              <Link href="#" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">Team</Link>
-              <Link href="#" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">Contact</Link>
+              <Link href="/team" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">Team</Link>
+              <Link href="/contact" className="text-[12px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] px-[20px] py-[3px] rounded-[8px]">Contact</Link>
             </div>
           </div>
         </div>

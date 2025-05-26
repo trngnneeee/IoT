@@ -10,16 +10,24 @@ export const MainLayout = ({ children }) => {
 
   return (
     <>
-      {pathName.startsWith("/dashboard") ? (
+      {pathName.startsWith("/account") ? (
         <>
-          <Sider />
           {children}
         </>
       ) : (
         <>
-          <Header />
-          {children}
-          <Footer />
+          {pathName.startsWith("/dashboard") ? (
+            <>
+              <Sider />
+              {children}
+            </>
+          ) : (
+            <>
+              <Header />
+              {children}
+              <Footer />
+            </>
+          )}
         </>
       )}
     </>
