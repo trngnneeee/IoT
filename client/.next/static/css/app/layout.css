@@ -372,6 +372,9 @@
   .gap-\[10px\] {
     gap: 10px;
   }
+  .gap-\[15px\] {
+    gap: 15px;
+  }
   .gap-\[20px\] {
     gap: 20px;
   }
@@ -724,6 +727,20 @@
   .outline-none {
     --tw-outline-style: none;
     outline-style: none;
+  }
+  .hover\:bg-\[\#5e5e5e00\] {
+    &:hover {
+      @media (hover: hover) {
+        background-color: #5e5e5e00;
+      }
+    }
+  }
+  .hover\:bg-\[\#5e5e5e18\] {
+    &:hover {
+      @media (hover: hover) {
+        background-color: #5e5e5e18;
+      }
+    }
   }
   .hover\:bg-\[\#5e5e5e33\] {
     &:hover {

@@ -101,7 +101,7 @@ export const Header = () => {
               <Link href="/dashboard" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]">Dashboard</Link>
             )}
             {account && (
-              <button className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] sm:px-[20px] py-[3px] rounded-[8px] cursor-pointer" onClick={handleLogout}>Logout</button>
+              <button className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[#F93C65] px-[10px] sm:px-[20px] py-[3px] rounded-[8px] cursor-pointer" onClick={handleLogout}>Logout</button>
             )}
           </div>
         </div>
