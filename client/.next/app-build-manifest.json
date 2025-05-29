@@ -6,6 +6,16 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
+    "/(pages)/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(pages)/dashboard/page.js"
+    ],
+    "/(pages)/account/login/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(pages)/account/login/page.js"
+    ],
     "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -23,11 +33,6 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(pages)/contact/page.js"
     ],
-    "/(pages)/account/login/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(pages)/account/login/page.js"
-    ],
     "/(pages)/account/register/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -38,20 +43,10 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(pages)/account/forgot-password/page.js"
     ],
-    "/(pages)/account/otp-password/page": [
+    "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(pages)/account/otp-password/page.js"
-    ],
-    "/(pages)/account/reset-password/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(pages)/account/reset-password/page.js"
-    ],
-    "/(pages)/dashboard/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(pages)/dashboard/page.js"
+      "static/chunks/app/_not-found/page.js"
     ]
   }
 }

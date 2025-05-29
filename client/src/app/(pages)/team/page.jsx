@@ -60,7 +60,7 @@ export default function Team() {
           >
             {data.map((item, index) => (
               <SwiperSlide key={index}>
-                <div className='flex flex-col items-center relative mt-[75px] sm:mt-[125px]'>
+                <div className='flex flex-col items-center relative mt-[75px] sm:mt-[125px] cursor-pointer'>
                   <div className='rounded-[50%] overflow-hidden w-[150px] sm:w-[200px] xl:w-[250px] h-[150px] sm:h-[200px] xl:h-[250px] border-[#ddd] border-[5px] absolute top-[-75px] sm:top-[-100px] xl:top-[-125px]'>
                     <img src={item.image} className='w-full h-full object-cover' />
                   </div>
