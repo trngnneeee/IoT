@@ -1,31 +1,25 @@
 "use client"
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useAuth } from "../../../hooks/useAuth"
+import { useEffect } from "react";
 
 export const MainPage = () => {
-  const [load, setLoad] = useState(false);
   const router = useRouter();
-  
+  const { isLogin, infoUser, isLoading } =  useAuth();
+
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/verifyToken`, {
-      method: "POST",
-      credentials: "include"
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.code == "error")
-        {
-          router.push("/account/login");
-        }
-        else setLoad(true);
-      })
-  }, []);
-  
+    if (!isLogin && !isLoading) router.push("/account/login");
+  }, [isLogin, router, isLoading]);
+
+  if (isLoading) return <p>Loading...</p>;
+
   return (
-    <>  
-      {load && (
-        <></>
+    <>
+      {isLogin && (
+        <>
+          
+        </>
       )}
     </>
   );

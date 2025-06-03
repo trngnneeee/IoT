@@ -1,4 +1,4 @@
-import { MainPage } from "./MainPage";
+import { MainOTPPasswordPage } from "./MainOTPPasswordPage";
 
 export const metadata = {
   title: "OTP Password"
@@ -7,7 +7,7 @@ export const metadata = {
 export default function Home() {
   return (
     <>
-      <MainPage/>
+      <MainOTPPasswordPage/>      
     </>
   );
 }

@@ -6,21 +6,26 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/(pages)/dashboard/page": [
+    "/(pages)/account/forgot-password/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(pages)/dashboard/page.js"
-    ],
-    "/(pages)/account/login/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(pages)/account/login/page.js"
+      "static/chunks/app/(pages)/account/forgot-password/page.js"
     ],
     "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/page.css",
       "static/chunks/app/page.js"
+    ],
+    "/(pages)/account/otp-password/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(pages)/account/otp-password/page.js"
+    ],
+    "/(pages)/account/register-initial/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(pages)/account/register-initial/page.js"
     ],
     "/(pages)/team/page": [
       "static/chunks/webpack.js",
@@ -33,20 +38,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(pages)/contact/page.js"
     ],
+    "/(pages)/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(pages)/dashboard/page.js"
+    ],
+    "/(pages)/account/login/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(pages)/account/login/page.js"
+    ],
     "/(pages)/account/register/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/(pages)/account/register/page.js"
-    ],
-    "/(pages)/account/forgot-password/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/(pages)/account/forgot-password/page.js"
-    ],
-    "/_not-found/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
     ]
   }
 }

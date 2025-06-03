@@ -76,9 +76,8 @@ module.exports.loginPost = async (req, res) => {
   res.cookie("token", token, {
     maxAge: req.body.rememberPassword ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000,
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env.NODE_ENV === "production" ? true : false,
     sameSite: "lax",
-    path: "/"
   });
 
   res.json({

@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { HiViewList } from "react-icons/hi";
 import Swal from 'sweetalert2'
+import { useAuth } from "../../../../hooks/useAuth";
 
 export const Header = () => {
+  const { isLogin, userInfo } = useAuth();
+
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false)
-  const [account, setAccount] = useState(null);
-  const [load, setLoad] = useState(false);
 
   const router = useRouter();
 
@@ -21,23 +22,6 @@ export const Header = () => {
     window.addEventListener("scroll", handleRolled);
     return () => window.removeEventListener("scroll", handleRolled);
   })
-
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/verifyToken`, {
-      method: "POST",
-      credentials: "include"
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.code == "error") {
-          // router.push("/account/login");
-        }
-        else {
-          setAccount(data.account);
-        }
-      })
-      .finally(setLoad(true));
-  }, []);
 
   const handleLogout = () => {
     fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/account/logout`, {
@@ -77,36 +61,34 @@ export const Header = () => {
         ></div>
       )}
 
-      {load && (
-        <div className={`flex justify-between items-center px-[30px] py-[20px] lg:py-[30px] bg-white sticky top-0 transition-shadow duration-300 z-50 rounded-b-[20px] ${scrolled ? "shadow-xl" : ""
-          }`}>
-          <div className="block sm:hidden cursor-pointer" onClick={() => { setOpen(true) }}>
-            <HiViewList className="text-[15px]" />
-          </div>
-          <div className="flex items-center gap-[20px]">
-            <Link href="/" className="w-[80px] sm:w-[100px] lg:w-[120px] h-auto">
-              <img className="w-full h-full object-cover" src="/logo.jpg" />
-            </Link>
-            <Link href="#" className="hidden sm:block text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[3px] rounded-[8px]" title="Product">Product</Link>
-            <Link href="/team" className="hidden sm:block text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[3px] rounded-[8px]" title="Team">Team</Link>
-            <Link href="/contact" className="hidden sm:block text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[3px] rounded-[8px]" title="Contact">Contact</Link>
-          </div>
-          <div className="flex items-center gap-[10px] sm:gap-[20px]">
-            {!account && (
-              <Link href="/account/login" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]" title="Login">Login</Link>
-            )}
-            {!account && (
-              <Link href="/account/register" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]" title="Register">Register</Link>
-            )}
-            {account && (
-              <Link href="/dashboard" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]" title="Dashboard">Dashboard</Link>
-            )}
-            {account && (
-              <button className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[#F93C65] px-[10px] sm:px-[20px] py-[3px] rounded-[8px] cursor-pointer" onClick={handleLogout} title="Logout">Logout</button>
-            )}
-          </div>
+      <div className={`flex justify-between items-center px-[30px] py-[20px] lg:py-[30px] bg-white sticky top-0 transition-shadow duration-300 z-50 rounded-b-[20px] ${scrolled ? "shadow-xl" : ""
+        }`}>
+        <div className="block sm:hidden cursor-pointer" onClick={() => { setOpen(true) }}>
+          <HiViewList className="text-[15px]" />
         </div>
-      )}
+        <div className="flex items-center gap-[20px]">
+          <Link href="/" className="w-[80px] sm:w-[100px] lg:w-[120px] h-auto">
+            <img className="w-full h-full object-cover" src="/logo.jpg" />
+          </Link>
+          <Link href="#" className="hidden sm:block text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[3px] rounded-[8px]" title="Product">Product</Link>
+          <Link href="/team" className="hidden sm:block text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[3px] rounded-[8px]" title="Team">Team</Link>
+          <Link href="/contact" className="hidden sm:block text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[3px] rounded-[8px]" title="Contact">Contact</Link>
+        </div>
+        <div className="flex items-center gap-[10px] sm:gap-[20px]">
+          {!isLogin && (
+            <Link href="/account/login" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]" title="Login">Login</Link>
+          )}
+          {!isLogin && (
+            <Link href="/account/register" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]" title="Register">Register</Link>
+          )}
+          {isLogin && (
+            <Link href="/dashboard" className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[white] bg-[#505050] hover:bg-[#505050bd] px-[10px] sm:px-[20px] py-[3px] rounded-[8px]" title="Dashboard">Dashboard</Link>
+          )}
+          {isLogin && (
+            <button className="text-[10px] sm:text-[14px] lg:text-[16px] font-[600] text-[#F93C65] px-[10px] sm:px-[20px] py-[3px] rounded-[8px] cursor-pointer" onClick={handleLogout} title="Logout">Logout</button>
+          )}
+        </div>
+      </div>
     </>
   );
 }

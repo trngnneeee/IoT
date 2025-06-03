@@ -1,4 +1,4 @@
-import { MainPage } from "./MainPage";
+import { MainForgotPasswordPage } from "./MainForgotPasswordPage";
 
 export const metadata = {
   title: "Forgot Password"
@@ -7,7 +7,7 @@ export const metadata = {
 export default function Home() {
   return (
     <>
-      <MainPage/>
+      <MainForgotPasswordPage/>
     </>
   );
 }

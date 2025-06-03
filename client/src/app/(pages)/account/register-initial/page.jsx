@@ -1,4 +1,4 @@
-import { MainPage } from "./MainPage";
+import { MainRegisterInitPage } from "./MainRegisterInitPage";
 
 export const metadata = {
   title: "Login"
@@ -7,7 +7,7 @@ export const metadata = {
 export default function Home() {
   return (
     <>
-      <MainPage/>
+      <MainRegisterInitPage/>
     </>
   );
 }

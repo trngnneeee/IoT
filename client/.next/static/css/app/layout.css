@@ -457,9 +457,6 @@
   .px-\[50px\] {
     padding-inline: 50px;
   }
-  .py-0 {
-    padding-block: calc(var(--spacing) * 0);
-  }
   .py-\[3px\] {
     padding-block: 3px;
   }
