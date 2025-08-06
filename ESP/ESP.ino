@@ -1,4 +1,6 @@
 #include <WiFi.h>
+#include <ArduinoJson.h>
+#include <ESP32Servo.h>
 
 const char* ssid = "L1";
 const char* password = "0932633299";
@@ -8,9 +10,12 @@ const int port = 8000;
 
 unsigned long lastSendTime = 0;
 
+Servo myservo;
+
 void setup() {
   Serial.begin(115200);
   wifiConnect();
+  myservo.attach(18);
 }
 
 void loop() {
@@ -21,8 +26,8 @@ void loop() {
   }
 
   // Gửi mỗi 5 giây khi WiFi vẫn còn
-  if (millis() - lastSendTime > 5000 && WiFi.status() == WL_CONNECTED) {
-    sendPostRequest();
+  if (millis() - lastSendTime > 2000 && WiFi.status() == WL_CONNECTED) {
+    getOpenCanRequest();
     lastSendTime = millis();
   }
 }
@@ -72,4 +77,57 @@ void sendPostRequest() {
   }
 
   client.stop();
+}
+
+void getOpenCanRequest(){
+  WiFiClient client;
+  String json = "";
+
+  if (!client.connect(host, port)) {
+    Serial.println("❌ Cannot connect to host:port");
+    return;
+  }
+
+  client.print(String("GET ") + "/can/get-req" + " HTTP/1.1\r\n"
+              + "Host: " + host + "\r\n"
+              + "Connection: close\r\n\r\n");
+
+  while (client.connected()) {
+    while (client.available()) {
+      String line = client.readStringUntil('\n');
+      int idx = line.indexOf("{");
+      if (idx != -1) {
+        json = line.substring(idx);
+      }
+    }
+  }
+
+  client.stop();
+
+  if (json.length() == 0) {
+    Serial.println("❌ Không tìm thấy JSON trong phản hồi");
+    return;
+  }
+
+  StaticJsonDocument<200> doc;
+  DeserializationError error = deserializeJson(doc, json);
+
+  if (error) {
+    Serial.print(F("❌ deserializeJson() failed: "));
+    Serial.println(error.f_str());
+    return;
+  }
+
+  const char* code = doc["code"];
+  const char* message = doc["message"];
+
+  Serial.print("✅ Server responded with code: ");
+  Serial.println(code);
+  Serial.println(message);
+
+  if (strcmp(code, "success") == 0) {
+    myservo.write(90);
+    delay(2000);
+    myservo.write(0);
+  }
 }

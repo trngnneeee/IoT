@@ -1,4 +1,5 @@
 import { RiDeleteBin7Line } from "react-icons/ri";
+import { OpenCanButton } from "./OpenCanButton"
 
 export const MainPage = () => {
   return (
@@ -14,9 +15,11 @@ export const MainPage = () => {
               <div className="text-[18px] font-bold">Trash volume: 1.5kg</div>
             </div>
             <div className="flex justify-center mb-[25px]">
-              <button className="bg-[#62975D] hover:bg-[#62975db7] py-[20px] text-white font-bold rounded-[10px] w-[80%] flex items-center justify-center">
-                Open can
-              </button>
+              <OpenCanButton
+                bgColor={"#62975D"}
+                hoverBg={"#62975db7"}
+                id={1}
+              />
             </div>
           </div>
         </div>
@@ -30,9 +33,11 @@ export const MainPage = () => {
               <div className="text-[18px] font-bold">Trash volume: 1.5kg</div>
             </div>
             <div className="flex justify-center mb-[25px]">
-              <button className="bg-[#50537E] hover:bg-[#50537eb0] py-[20px] text-white font-bold rounded-[10px] w-[80%] flex items-center justify-center">
-                Open can
-              </button>
+              <OpenCanButton
+                bgColor={"#50537E"}
+                hoverBg={"#50537eb0"}
+                id={2}
+              />
             </div>
           </div>
         </div>
@@ -46,9 +51,11 @@ export const MainPage = () => {
               <div className="text-[18px] font-bold">Trash volume: 1.5kg</div>
             </div>
             <div className="flex justify-center mb-[25px]">
-              <button className="bg-[#66655F] hover:bg-[#66655fb0] py-[20px] text-white font-bold rounded-[10px] w-[80%] flex items-center justify-center">
-                Open can
-              </button>
+              <OpenCanButton
+                bgColor={"#66655F"}
+                hoverBg={"#66655fb0"}
+                id={3}
+              />
             </div>
           </div>
         </div>

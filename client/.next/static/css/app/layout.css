@@ -14,8 +14,6 @@
       "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
-    --color-yellow-100: oklch(97.3% 0.071 103.193);
-    --color-green-700: oklch(52.7% 0.154 150.069);
     --color-black: #000;
     --color-white: #fff;
     --spacing: 0.25rem;
@@ -216,9 +214,6 @@
   .my-\[20px\] {
     margin-block: 20px;
   }
-  .my-\[30px\] {
-    margin-block: 30px;
-  }
   .mt-\[10px\] {
     margin-top: 10px;
   }
@@ -234,9 +229,6 @@
   .mt-\[50px\] {
     margin-top: 50px;
   }
-  .mt-\[60px\] {
-    margin-top: 60px;
-  }
   .mt-\[75px\] {
     margin-top: 75px;
   }
@@ -245,9 +237,6 @@
   }
   .mr-\[50px\] {
     margin-right: 50px;
-  }
-  .mr-\[100px\] {
-    margin-right: 100px;
   }
   .mb-\[8px\] {
     margin-bottom: 8px;
@@ -272,9 +261,6 @@
   }
   .ml-\[350px\] {
     margin-left: 350px;
-  }
-  .ml-\[400px\] {
-    margin-left: 400px;
   }
   .block {
     display: block;
@@ -321,23 +307,14 @@
   .w-\[45\%\] {
     width: 45%;
   }
-  .w-\[50px\] {
-    width: 50px;
-  }
   .w-\[60\%\] {
     width: 60%;
-  }
-  .w-\[70\%\] {
-    width: 70%;
   }
   .w-\[80\%\] {
     width: 80%;
   }
   .w-\[80px\] {
     width: 80px;
-  }
-  .w-\[100px\] {
-    width: 100px;
   }
   .w-\[120px\] {
     width: 120px;
@@ -392,12 +369,6 @@
   }
   .gap-\[50px\] {
     gap: 50px;
-  }
-  .gap-\[70px\] {
-    gap: 70px;
-  }
-  .gap-\[100px\] {
-    gap: 100px;
   }
   .gap-\[400px\] {
     gap: 400px;
@@ -488,14 +459,8 @@
       background-color: color-mix(in oklab, var(--color-black) 40%, transparent);
     }
   }
-  .bg-green-700 {
-    background-color: var(--color-green-700);
-  }
   .bg-white {
     background-color: var(--color-white);
-  }
-  .bg-yellow-100 {
-    background-color: var(--color-yellow-100);
   }
   .bg-\[url\(\'\/login\.png\'\)\] {
     background-image: url('/login.png');
@@ -517,9 +482,6 @@
   }
   .p-\[20px\] {
     padding: 20px;
-  }
-  .p-\[50px\] {
-    padding: 50px;
   }
   .p-\[100px\] {
     padding: 100px;
@@ -625,15 +587,6 @@
   }
   .text-\[45px\] {
     font-size: 45px;
-  }
-  .text-\[50px\] {
-    font-size: 50px;
-  }
-  .text-\[70px\] {
-    font-size: 70px;
-  }
-  .text-\[100px\] {
-    font-size: 100px;
   }
   .text-\[150px\] {
     font-size: 150px;
@@ -747,48 +700,6 @@
     &:hover {
       @media (hover: hover) {
         background-color: #4880FF;
-      }
-    }
-  }
-  .hover\:bg-\[\#50537eb0\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: #50537eb0;
-      }
-    }
-  }
-  .hover\:bg-\[\#50537ed0\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: #50537ed0;
-      }
-    }
-  }
-  .hover\:bg-\[\#62975db7\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: #62975db7;
-      }
-    }
-  }
-  .hover\:bg-\[\#62975dd7\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: #62975dd7;
-      }
-    }
-  }
-  .hover\:bg-\[\#66655F\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: #66655F;
-      }
-    }
-  }
-  .hover\:bg-\[\#66655fb0\] {
-    &:hover {
-      @media (hover: hover) {
-        background-color: #66655fb0;
       }
     }
   }
