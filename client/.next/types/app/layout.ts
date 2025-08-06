@@ -1,4 +1,4 @@
-// File: D:\28Tech - Frontend\IoT-Web\client\src\app\layout.js
+// File: E:\Web_Programming\IoT-Web\client\src\app\layout.js
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

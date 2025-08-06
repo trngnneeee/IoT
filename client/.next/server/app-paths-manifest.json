@@ -1,10 +1,5 @@
 {
-  "/page": "app/page.js",
-  "/(pages)/account/register-initial/page": "app/(pages)/account/register-initial/page.js",
-  "/(pages)/contact/page": "app/(pages)/contact/page.js",
-  "/(pages)/team/page": "app/(pages)/team/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/(pages)/dashboard/page": "app/(pages)/dashboard/page.js",
-  "/(pages)/account/login/page": "app/(pages)/account/login/page.js",
-  "/(pages)/account/forgot-password/page": "app/(pages)/account/forgot-password/page.js",
-  "/(pages)/account/register/page": "app/(pages)/account/register/page.js"
+  "/page": "app/page.js"
 }

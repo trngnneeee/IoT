@@ -15,12 +15,14 @@ mongoose.connect(process.env.DATABASE)
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: function (origin, callback) {
+    callback(null, true);
+  },
   credentials: true
 }));
 
 app.use("/", indexRoute);
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`App listening on port ${port}`)
 })

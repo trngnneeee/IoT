@@ -19,7 +19,7 @@ export const Section1 = () => {
             <Link href="https://en.wikipedia.org/wiki/Internet_of_things" target="blank" title="Wikipedia-IoT" className="hidden sm:block text-[10px] lg:text-[20px] font-[600] text-[#505050] hover:bg-[#5e5e5e33] px-[20px] py-[10px] rounded-[8px]">About IoT</Link>
           </div>
         </div>
-        <div className="w-[250px] sm:w-[400px] lg:w-[650px] h-auto overflow-hidden rounded-[10px]" data-aos="fade-up">
+        <div className="w-[250px] sm:w-[400px] lg:w-[550px] h-auto overflow-hidden rounded-[10px]" data-aos="fade-up">
           <img src="/homePic.png" className="w-full h-full object-cover" />
         </div>
       </div>
