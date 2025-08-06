@@ -39,16 +39,16 @@ export const Sider = () => {
             <AiOutlineHome className="text-[25px]" />
             <div className="text-[18px] font-medium">Home</div>
           </Link>
-          <Link href="/dashboard" className={"flex items-center gap-[20px] hover:bg-[#4880FF] hover:text-white px-[15px] py-[10px] rounded-[8px] mx-[20px] " + (pathName.startsWith("/dashboard") ? 'bg-[#4880FF] text-white' : '')}>
+          <Link href="/dashboard" className={"flex items-center gap-[20px] hover:bg-[#4880FF] hover:text-white px-[15px] py-[10px] rounded-[8px] mb-[10px] mx-[20px] " + (pathName.startsWith("/dashboard") ? 'bg-[#4880FF] text-white' : '')}>
             <RiDashboard2Line className="text-[25px]" />
             <div className="text-[18px] font-medium">Dashboard</div>
           </Link>
+          <Link href="/control" className={"flex items-center gap-[20px] hover:bg-[#4880FF] hover:text-white px-[15px] py-[10px] rounded-[8px] mx-[20px] " + (pathName.startsWith("/control") ? 'bg-[#4880FF] text-white' : '')}>
+            <IoMdSettings className="text-[25px]" />
+            <div className="text-[18px] font-medium">Control</div>
+          </Link>
         </div>
         <div className="mt-[20px]">
-          <Link href="/setting" className={"flex items-center gap-[20px] hover:bg-[#4880FF] hover:text-white px-[15px] py-[10px] rounded-[8px] mx-[20px] mb-[10px] " + (pathName.startsWith("/setting") ? 'bg-[#4880FF] text-white' : '')}>
-            <IoMdSettings className="text-[25px]" />
-            <div className="text-[18px] font-medium">Setting</div>
-          </Link>
           <Link href="#" className="flex items-center gap-[20px] text-[#F93C65] px-[15px] py-[10px] rounded-[8px] mx-[20px]" onClick={handleLogout}>
             <IoPowerSharp className="text-[25px]" />
             <div className="text-[18px] font-medium">Logout</div>

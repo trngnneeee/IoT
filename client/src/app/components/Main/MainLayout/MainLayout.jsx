@@ -16,7 +16,7 @@ export const MainLayout = ({ children }) => {
         </>
       ) : (
         <>
-          {pathName.startsWith("/dashboard") ? (
+          {pathName.startsWith("/dashboard") || pathName.startsWith("/control") ? (
             <>
               <Sider />
               {children}

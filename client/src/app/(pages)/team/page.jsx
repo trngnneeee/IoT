@@ -29,9 +29,9 @@ export default function Team() {
       studentID: "23127181",
       location: "TP HCM",
       email: "ntqduy23@clc.fitus.edu.vn",
-      facebook: "https://www.facebook.com/trngn.neee",
-      github: "https://github.com/trngnneeee",
-      instagram: "https://www.instagram.com/trngn.neee"
+      facebook: "https://www.facebook.com/duy.quoc.476407",
+      github: "https://github.com/ntqduy",
+      instagram: ""
     },
     {
       image: "/tn.jpg",
@@ -72,9 +72,9 @@ export default function Team() {
                       <div>{item.location}</div>
                     </div>
                     <div className='flex gap-[20px] mt-[15px] sm:mt-[30px]'>
-                      <Link href={item.facebook} className='hover:text-[#4880FF]'><FaFacebook className='text-[20px] sm:text-[24px]' /></Link>
-                      <Link href={item.instagram} className='hover:text-[#4880FF]'><BiLogoInstagramAlt className='text-[20px] sm:text-[24px]' /></Link>
-                      <Link href={item.github} className='hover:text-[#4880FF]'><FaGithub className='text-[20px] sm:text-[24px]' /></Link>
+                      {item.facebook && <Link target="_blank" href={item.facebook} className='hover:text-[#4880FF]'><FaFacebook className='text-[20px] sm:text-[24px]' /></Link>}
+                      {item.instagram && <Link target="_blank" href={item.instagram} className='hover:text-[#4880FF]'><BiLogoInstagramAlt className='text-[20px] sm:text-[24px]' /></Link>}
+                      {item.github && <Link target="_blank" href={item.github} className='hover:text-[#4880FF]'><FaGithub className='text-[20px] sm:text-[24px]' /></Link>}
                     </div>
                     <div className='text-[12px] sm:text-[16px] text-[#505050] mt-[20px] flex items-center gap-[5px]'>
                       <MdOutlineEmail className='text-[20px]' />
