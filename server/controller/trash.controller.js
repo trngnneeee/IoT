@@ -1,9 +1,34 @@
 const TrashVolume = require("../model/trash.model");
+const mailHelper = require("../helper/mail.helper");
+const AdminAccount = require("../model/admin-account.model");
 
-const formatToMinuteString = (date) => {
-  const d = new Date(date);
-  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
-};
+const sendWarningEmail = async (id, p) => {
+  const adminAccount = await AdminAccount.find({});
+  const emailList = adminAccount.map((item) => item.email);
+
+  const subject = `Cảnh báo: Thùng rác đã đầy`;
+
+  const content = `
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; background-color: #fff8e1;">
+  <h2 style="color: #d9534f;">⚠ Cảnh báo thùng rác đầy</h2>
+  <p>Xin chào,</p>
+  <p>Hệ thống phát hiện <strong>thùng rác ${id}</strong> đã đầy và cần được xử lý ngay.</p>
+  <div style="text-align: center; margin: 20px 0;">
+    <span style="font-size: 18px; font-weight: bold; color: #a94442; background-color: #f2dede; padding: 10px 20px; border-radius: 5px;">
+      Mức đầy: ${p}%
+    </span>
+  </div>
+  <p><strong>Hành động khuyến nghị:</strong> Vui lòng dọn thùng rác để tránh tràn hoặc gây mùi khó chịu.</p>
+  <p>Nếu bạn đã xử lý, vui lòng bỏ qua email này.</p>
+  <hr style="margin: 30px 0;">
+  <p style="font-size: 12px; color: #888;">Email này được gửi tự động từ hệ thống giám sát, vui lòng không trả lời lại.</p>
+</div>
+`;
+  for (const email of emailList)
+  {
+    mailHelper.sendMail(email, subject, content);
+  }
+}
 
 module.exports.trashVolumePost = async (req, res) => {
   const now = new Date();
@@ -21,6 +46,16 @@ module.exports.trashVolumePost = async (req, res) => {
     if (oldest) {
       await TrashVolume.deleteOne({ _id: oldest._id });
     }
+  }
+
+  if (req.body.percentage1 >= 100) {
+    sendWarningEmail(1, req.body.percentage1);
+  }
+  if (req.body.percentage2 >= 100) {
+    sendWarningEmail(2, req.body.percentage1);
+  }
+  if (req.body.percentage3 >= 100) {
+    sendWarningEmail(3, req.body.percentage1);
   }
 
   await TrashVolume.create({

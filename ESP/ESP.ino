@@ -58,14 +58,20 @@ void loop() {
   long distance1 = getDistance(trig_pin_1, echo_pin_1);
   long distance2 = getDistance(trig_pin_2, echo_pin_2);
   long distance3 = getDistance(trig_pin_3, echo_pin_3);
-  if (millis() - lastSendTrashPercentage > 1000 * 60 && WiFi.status() == WL_CONNECTED){
-    float percentage1 = ((21.0f - (float)distance1) / 21.0f) * 100.0f;
+  Serial.print("d1=");
+  Serial.println(distance1);
+  Serial.print("d2=");
+  Serial.println(distance2);
+  Serial.print("d3=");
+  Serial.println(distance3);
+  if (millis() - lastSendTrashPercentage > 1000 * 60 && WiFi.status() == WL_CONNECTED && distance1 != 0 && distance2 != 0 && distance3 != 0){
+    float percentage1 = ((15.0f - (float)distance1) / 15.0f) * 100.0f;
     percentage1 = constrain(percentage1, 0, 100);
 
-    float percentage2 = ((21.0f - (float)distance2) / 21.0f) * 100.0f;
+    float percentage2 = ((15.0f - (float)distance2) / 15.0f) * 100.0f;
     percentage2 = constrain(percentage2, 0, 100);
 
-    float percentage3 = ((21.0f - (float)distance3) / 21.0f) * 100.0f;
+    float percentage3 = ((15.0f - (float)distance3) / 15.0f) * 100.0f;
     percentage3 = constrain(percentage3, 0, 100);
     sendTrashPercentage(percentage1, percentage2, percentage3);
     lastSendTrashPercentage = millis();
