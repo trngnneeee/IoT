@@ -43,7 +43,7 @@ export const Sider = () => {
             <RiDashboard2Line className="text-[25px]" />
             <div className="text-[18px] font-medium">Dashboard</div>
           </Link>
-          <Link href="/control" className={"flex items-center gap-[20px] hover:bg-[#4880FF] hover:text-white px-[15px] py-[10px] rounded-[8px] mx-[20px] " + (pathName.startsWith("/control") ? 'bg-[#4880FF] text-white' : '')}>
+          <Link href="/control" className={"flex items-center gap-[20px] hover:bg-[#4880FF] hover:text-white px-[15px] py-[10px] rounded-[8px] mb-[10px] mx-[20px] " + (pathName.startsWith("/control") ? 'bg-[#4880FF] text-white' : '')}>
             <IoMdSettings className="text-[25px]" />
             <div className="text-[18px] font-medium">Control</div>
           </Link>

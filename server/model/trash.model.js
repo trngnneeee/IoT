@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
-  value: Number,
+  percentage1: Number,
+  percentage2: Number,
+  percentage3: Number,
   date: Date
 })
 

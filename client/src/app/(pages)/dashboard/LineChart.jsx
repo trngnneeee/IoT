@@ -21,17 +21,33 @@ ChartJS.register(
   Title
 );
 
-const LineChart = ({ labels, dataPoints }) => {
+const LineChart = ({ labels, dataPoints1, dataPoints2, dataPoints3 }) => {
   const data = {
-    labels: labels, 
+    labels: labels,
     datasets: [
       {
-        label: "Percentage (%)",
-        data: dataPoints, 
+        label: "Bin 1",
+        data: dataPoints1,
         borderColor: "rgba(75,192,192,1)",
         backgroundColor: "rgba(75,192,192,0.2)",
-        fill: true,
-        tension: 0.3, 
+        fill: false,
+        tension: 0.3,
+      },
+      {
+        label: "Bin 2",
+        data: dataPoints2,
+        borderColor: "rgba(192,75,192,1)",
+        backgroundColor: "rgba(192,75,192,0.2)",
+        fill: false,
+        tension: 0.3,
+      },
+      {
+        label: "Bin 3",
+        data: dataPoints3,
+        borderColor: "rgba(192,192,75,1)",
+        backgroundColor: "rgba(192,192,75,0.2)",
+        fill: false,
+        tension: 0.3,
       },
     ],
   };
@@ -42,41 +58,22 @@ const LineChart = ({ labels, dataPoints }) => {
       title: {
         display: true,
         text: "10-Minutes Waste Volume Chart",
-        font: {
-          size: 24,
-          weight: 'bold'
-        }
+        font: { size: 24, weight: "bold" },
       },
-      tooltip: {
-        mode: "index",
-        intersect: false,
-      },
-      legend: {
-        position: "top",
-      },
+      tooltip: { mode: "index", intersect: false },
+      legend: { position: "top" },
     },
     scales: {
-      x: {
-        title: {
-          display: true,
-          text: "Hour",
-        },
-      },
+      x: { title: { display: true, text: "Time (HH:mm)" } },
       y: {
-        title: {
-          display: true,
-          text: "Percentage (%)",
-        },
+        title: { display: true, text: "Percentage (%)" },
         min: 0,
         max: 100,
-        ticks: {
-          callback: (value) => `${value}%`,
-        },
+        ticks: { callback: (v) => `${v}%` },
       },
     },
   };
 
   return <Line data={data} options={options} />;
 };
-
 export default LineChart;

@@ -61,7 +61,11 @@ export const MainPage = () => {
         </div>
       </div>
       <div className="flex justify-center mt-[50px]">
-        <button className="bg-[#7E4F50] hover:bg-[#7e4f50a8] px-[50px] py-[20px] text-white font-bold text-[18px] rounded-[10px]">Open 3 Can</button>
+        <OpenCanButton
+          bgColor={"#7E4F50"}
+          hoverBg={"#7e4f50a8"}
+          id={4}
+        />
       </div>
     </>
   );

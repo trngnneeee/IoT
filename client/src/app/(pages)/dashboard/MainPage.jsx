@@ -9,63 +9,98 @@ export const MainPage = () => {
   const router = useRouter();
   const { isLogin, infoUser, isLoading } = useAuth();
   const [chartData, setChartData] = useState(null);
+  const [tableData, setTableData] = useState(null);
 
   useEffect(() => {
     if (!isLogin && !isLoading) router.push("/account/login");
   }, [isLogin, router, isLoading]);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/trash/trash-volume`)
-      .then((res) => res.json())
+    const fetchData1 = () => {
+      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/trash/trash-volume`)
+        .then(res => res.json())
+        .then((data) => {
+          const labels = data.data.map(item =>
+            new Date(item.hour).toLocaleString([], {
+              day: "2-digit",
+              month: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false
+            })
+          )
+          const dataPoints1 = data.data.map(item => item.percentage1);
+          const dataPoints2 = data.data.map(item => item.percentage2);
+          const dataPoints3 = data.data.map(item => item.percentage3);
+
+          setChartData({
+            labels,
+            dataPoints1,
+            dataPoints2,
+            dataPoints3
+          });
+        })
+    }
+
+    fetchData1();
+
+    setInterval(fetchData1, 1 * 60 * 1000);
+  }, []);
+
+  useEffect(() => {
+    const fetchData2 = () => {
+      fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/can/get-req-stas`)
+      .then(res => res.json())
       .then((data) => {
-        if (data) {
-          setChartData(data.data);
-        }
+        setTableData(data.data);
       })
+    }
+
+    fetchData2();
+
+    setInterval(fetchData2, 1 * 60 * 1000);
   }, [])
 
-  let labels = [];
-  let dataPoints = [];
-  if (chartData && chartData.length) {
-    const valueMap = new Map();
-
-    chartData.forEach((item) => {
-      const rawDate = new Date(item.hour);
-      const labelStr = rawDate.toLocaleTimeString("en-EN", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      });
-      valueMap.set(labelStr, item.value);
-    });
-
-    // 10 phút gần nhất, từng phút một
-    labels = Array.from({ length: 10 }, (_, i) => {
-      const date = new Date();
-      date.setMinutes(date.getMinutes() - (9 - i));
-      return date.toLocaleTimeString("en-EN", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      });
-    });
-
-    dataPoints = labels.map((label) => valueMap.get(label) || 0);
-  }
-
   if (isLoading) return <p>Loading...</p>;
+
   return (
     <>
       {isLogin && chartData && (
-        <>
-          <div className="ml-[350px] mr-[50px] pt-[100px]">
-            <div className="flex flex-col justify-center items-center border-[3px] border-[#ddd] w-full py-[50px]">
-              <div className="w-full max-w-3xl">
-                <LineChart labels={labels} dataPoints={dataPoints} />
-              </div>
+        <div className="ml-[350px] mr-[30px]">
+          <div className="flex justify-center items-center w-full py-[50px] gap-[50px]">
+            <div className="w-full max-w-3xl">
+              {chartData && (
+                <LineChart
+                  labels={chartData.labels}
+                  dataPoints1={chartData.dataPoints1}
+                  dataPoints2={chartData.dataPoints2}
+                  dataPoints3={chartData.dataPoints3}
+                />
+              )}
+            </div>
+            <div className="overflow-x-auto border border-gray-300 rounded-lg shadow-lg">
+              <div className="text-center text-[20px] font-bold mb-[20px] text-gray-700">Open-can Statistics</div>
+              <table className="min-w-full divide-y divide-gray-200 text-center">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-[10px] py-3 text-[12px] font-bold text-gray-700">Name</th>
+                    <th className="px-[10px] py-3 text-[12px] font-bold text-gray-700">Date - Hour</th>
+                    <th className="px-[10px] py-3 text-[12px] font-bold text-gray-700">Count</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {tableData && tableData.map((item, index) => (
+                    <tr key={index}>
+                      <td className="px-[10px] text-[11px] py-3 whitespace-nowrap">{item.name}</td>
+                      <td className="px-[10px] text-[11px] py-3 whitespace-nowrap">{new Date(item.date).toLocaleString()}</td>
+                      <td className="px-[10px] text-[11px] py-3 whitespace-nowrap">{item.count}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
-        </>
+        </div>
       )}
     </>
   );

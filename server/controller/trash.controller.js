@@ -7,53 +7,49 @@ const formatToMinuteString = (date) => {
 
 module.exports.trashVolumePost = async (req, res) => {
   const now = new Date();
-  const nowMinute = formatToMinuteString(now);
+  const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
 
-  const recentRecords = await TrashVolume.find()
-    .sort({ date: -1 }) 
-    .limit(10);
+  // Xóa các bản ghi cũ hơn 10 phút
+  await TrashVolume.deleteMany({ date: { $lt: tenMinutesAgo } });
 
-  const existing = recentRecords.find(item => formatToMinuteString(item.date) === nowMinute);
+  // Đếm số bản ghi hiện tại còn lại (từ 10 phút trước tới giờ)
+  const count = await TrashVolume.countDocuments({ date: { $gte: tenMinutesAgo } });
 
-  if (existing) {
-    await TrashVolume.findByIdAndUpdate(existing._id, {
-      ...req.body,
-      date: now
-    });
-  } else {
-    if (recentRecords.length >= 10) {
-      const oldest = recentRecords[recentRecords.length - 1];
-      await TrashVolume.findByIdAndDelete(oldest._id);
+  // Nếu còn >= 10 bản ghi, xóa bản ghi cũ nhất
+  if (count >= 10) {
+    const oldest = await TrashVolume.findOne({ date: { $gte: tenMinutesAgo } }).sort({ date: 1 });
+    if (oldest) {
+      await TrashVolume.deleteOne({ _id: oldest._id });
     }
-
-    await TrashVolume.create({
-      ...req.body,
-      date: now
-    });
   }
+
+  await TrashVolume.create({
+    percentage1: req.body.percentage1,
+    percentage2: req.body.percentage2,
+    percentage3: req.body.percentage3,
+    date: now
+  });
 
   res.json({
     code: "success",
-    message: "Trash volume saved successfully!"
+    message: "Trash percentage saved successfully!"
   });
 };
 
 module.exports.trashVolumeGet = async (req, res) => {
-  const now = new Date();
-  const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
-
-  const rawData = await TrashVolume.find({
-    date: { $gte: tenMinutesAgo, $lte: now }
-  });
-
-  const data = rawData.map(item => ({
-    hour: new Date(item.date).toISOString(), 
-    value: item.value
-  }));
-
+  const rawData = await TrashVolume.find({});
+  const data = [];
+  rawData.forEach((item) => {
+    data.push({
+      hour: new Date(item.date).toISOString(),
+      percentage1: item.percentage1,
+      percentage2: item.percentage2,
+      percentage3: item.percentage3
+    })
+  })
   res.json({
     code: "success",
     message: "Get data successfully!",
     data: data
-  });
+  })
 };

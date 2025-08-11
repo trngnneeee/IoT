@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
 
 const schema = new mongoose.Schema({
-  arr: Array,
-  expireAt: { 
-    type: Date,
-    expires: 0
-  }
+  id: Number,
+  pressedBy: String,
+  pressed: Boolean,
+  date: Date
 })
 
 const OpenCan = mongoose.model('OpenCan', schema, "open-can");

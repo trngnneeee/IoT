@@ -4,7 +4,9 @@ import Swal from 'sweetalert2'
 
 export const OpenCanButton = ({ bgColor, hoverBg, id }) => {
   const handleClick = () => {
-    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/can?id=${id}`)
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/can?id=${id}`, {
+      credentials: "include"
+    })
       .then(res => res.json())
       .then((data) => {
         Swal.fire({

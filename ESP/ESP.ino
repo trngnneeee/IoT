@@ -1,21 +1,45 @@
 #include <WiFi.h>
+#include <WiFiManager.h>
 #include <ArduinoJson.h>
 #include <ESP32Servo.h>
 
-const char* ssid = "L1";
-const char* password = "0932633299";
+const char* ssid = "Haha";
+const char* password = "12345678";
 
-const char* host = "192.168.10.169";
+const char* host = "10.123.1.83";
 const int port = 8000;
 
-unsigned long lastSendTime = 0;
+unsigned long lastCheckOpenCanRequest = 0;
+unsigned long lastSendTrashPercentage = 0;
 
-Servo myservo;
+Servo myservo1;
+Servo myservo2;
+Servo myservo3;
+
+int echo_pin_1 = 21;
+int trig_pin_1 = 22;
+
+int echo_pin_2 = 23;
+int trig_pin_2 = 25;
+
+int echo_pin_3 = 26;
+int trig_pin_3 = 27;
+
 
 void setup() {
   Serial.begin(115200);
   wifiConnect();
-  myservo.attach(18);
+  myservo1.attach(17);
+  myservo2.attach(18);
+  myservo3.attach(19);
+  pinMode(trig_pin_1, OUTPUT);
+  pinMode(echo_pin_1, INPUT);
+
+  pinMode(trig_pin_2, OUTPUT);
+  pinMode(echo_pin_2, INPUT);
+
+  pinMode(trig_pin_3, OUTPUT);
+  pinMode(echo_pin_3, INPUT);
 }
 
 void loop() {
@@ -26,23 +50,79 @@ void loop() {
   }
 
   // Gửi mỗi 5 giây khi WiFi vẫn còn
-  if (millis() - lastSendTime > 2000 && WiFi.status() == WL_CONNECTED) {
+  if (millis() - lastCheckOpenCanRequest > 2000 && WiFi.status() == WL_CONNECTED) {
     getOpenCanRequest();
-    lastSendTime = millis();
+    lastCheckOpenCanRequest = millis();
   }
+
+  long distance1 = getDistance(trig_pin_1, echo_pin_1);
+  long distance2 = getDistance(trig_pin_2, echo_pin_2);
+  long distance3 = getDistance(trig_pin_3, echo_pin_3);
+  if (millis() - lastSendTrashPercentage > 1000 * 60 && WiFi.status() == WL_CONNECTED){
+    float percentage1 = ((21.0f - (float)distance1) / 21.0f) * 100.0f;
+    percentage1 = constrain(percentage1, 0, 100);
+
+    float percentage2 = ((21.0f - (float)distance2) / 21.0f) * 100.0f;
+    percentage2 = constrain(percentage2, 0, 100);
+
+    float percentage3 = ((21.0f - (float)distance3) / 21.0f) * 100.0f;
+    percentage3 = constrain(percentage3, 0, 100);
+    sendTrashPercentage(percentage1, percentage2, percentage3);
+    lastSendTrashPercentage = millis();
+  }
+}
+
+long getDistance(int TRIG_PIN, int ECHO_PIN){
+  long duration, distance;
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+  duration = pulseIn(ECHO_PIN, HIGH);
+  distance = (duration * 0.034) / 2;
+  return distance;
 }
 
 void wifiConnect() {
-  WiFi.begin(ssid, password);
-  Serial.print("Connecting to WiFi");
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
+  Serial.begin(115200);
+
+  // Khởi tạo một đối tượng WiFiManager
+  WiFiManager wifiManager;
+
+  // Nếu bạn muốn xóa thông tin WiFi đã lưu để test lại từ đầu, hãy bỏ comment dòng dưới.
+  // wifiManager.resetSettings();
+
+  // Đặt tên cho Điểm Truy Cập (Access Point) mà ESP32-CAM sẽ tạo ra
+  const char *apName = "Smart Bin";
+
+  // Khi vào chế độ cấu hình, chúng ta sẽ cho đèn Flash nhấp nháy để báo hiệu
+  wifiManager.setAPCallback([](WiFiManager *myWiFiManager) {
+    Serial.println("Đang trong chế độ cấu hình WiFi...");
+    Serial.print("Mở WiFi trên điện thoại và kết nối vào mạng: ");
+    Serial.println(myWiFiManager->getConfigPortalSSID());
+  });
+
+  // Bắt đầu quá trình tự động kết nối.
+  if (!wifiManager.autoConnect(apName)) {
+    Serial.println("Không thể kết nối WiFi và đã hết thời gian chờ.");
+    Serial.println("Đang khởi động lại...");
+    ESP.restart();
+    delay(1000);
   }
-  Serial.println(" Connected!");
+
+  // Nếu code chạy đến đây, nghĩa là đã kết nối WiFi thành công!
+  Serial.println("");
+  Serial.println("=============================================");
+  Serial.println("ĐÃ KẾT NỐI WIFI THÀNH CÔNG!");
+  Serial.print("Tên WiFi (SSID): ");
+  Serial.println(WiFi.SSID());
+  Serial.print("Địa chỉ IP của ESP32-CAM: ");
+  Serial.println(WiFi.localIP());
+  Serial.println("=============================================");
 }
 
-void sendPostRequest() {
+void sendTrashPercentage(float p1, float p2, float p3) {
   WiFiClient client;
 
   // Kiểm tra kết nối tới server trước khi gửi
@@ -52,8 +132,11 @@ void sendPostRequest() {
   }
 
   // Tạo JSON từ số random
-  int value = random(0, 101);
-  String jsonData = "{\"value\": " + String(value) + "}";
+  String jsonData = "{";
+  jsonData += "\"percentage1\": " + String(p1, 2) + ",";
+  jsonData += "\"percentage2\": " + String(p2, 2) + ",";
+  jsonData += "\"percentage3\": " + String(p3, 2);
+  jsonData += "}";
 
   Serial.print("✅ Sending JSON: ");
   Serial.println(jsonData);
@@ -79,9 +162,9 @@ void sendPostRequest() {
   client.stop();
 }
 
-void getOpenCanRequest(){
+void getOpenCanRequest() {
   WiFiClient client;
-  String json = "";
+  String response = "";
 
   if (!client.connect(host, port)) {
     Serial.println("❌ Cannot connect to host:port");
@@ -92,25 +175,26 @@ void getOpenCanRequest(){
               + "Host: " + host + "\r\n"
               + "Connection: close\r\n\r\n");
 
-  while (client.connected()) {
+  // Đọc toàn bộ response
+  while (client.connected() || client.available()) {
     while (client.available()) {
-      String line = client.readStringUntil('\n');
-      int idx = line.indexOf("{");
-      if (idx != -1) {
-        json = line.substring(idx);
-      }
+      char c = client.read();
+      response += c;
     }
   }
 
   client.stop();
 
-  if (json.length() == 0) {
-    Serial.println("❌ Không tìm thấy JSON trong phản hồi");
+  int bodyIndex = response.indexOf("\r\n\r\n");
+  if (bodyIndex == -1) {
+    Serial.println("❌ Không tìm thấy phần body trong phản hồi");
     return;
   }
 
+  String body = response.substring(bodyIndex + 4);
+
   StaticJsonDocument<200> doc;
-  DeserializationError error = deserializeJson(doc, json);
+  DeserializationError error = deserializeJson(doc, body);
 
   if (error) {
     Serial.print(F("❌ deserializeJson() failed: "));
@@ -118,16 +202,39 @@ void getOpenCanRequest(){
     return;
   }
 
-  const char* code = doc["code"];
-  const char* message = doc["message"];
+  const char* code = doc["code"] | "";
+  const char* message = doc["message"] | "";
+  int id = doc["id"] | 0;
 
-  Serial.print("✅ Server responded with code: ");
-  Serial.println(code);
-  Serial.println(message);
-
-  if (strcmp(code, "success") == 0) {
-    myservo.write(90);
-    delay(2000);
-    myservo.write(0);
+  if (strcmp(code, "success") == 0 && id != 0) {
+    switch (id) {
+      case 1:
+        myservo1.write(90);
+        delay(5000);
+        myservo1.write(0);
+        break;
+      case 2:
+        myservo2.write(90);
+        delay(5000);
+        myservo2.write(0);
+        break;
+      case 3:
+        myservo3.write(90);
+        delay(5000);
+        myservo3.write(0);
+        break;
+      case 4:
+        myservo1.write(90);
+        myservo2.write(90);
+        myservo3.write(90);
+        delay(5000);
+        myservo1.write(0);
+        myservo2.write(0);
+        myservo3.write(0);
+        break;
+      default:
+        Serial.println("❌ Unknown servo id");
+        break;
+    }
   }
 }
