@@ -58,12 +58,12 @@ void loop() {
   long distance1 = getDistance(trig_pin_1, echo_pin_1);
   long distance2 = getDistance(trig_pin_2, echo_pin_2);
   long distance3 = getDistance(trig_pin_3, echo_pin_3);
-  Serial.print("d1=");
-  Serial.println(distance1);
-  Serial.print("d2=");
-  Serial.println(distance2);
-  Serial.print("d3=");
-  Serial.println(distance3);
+  // Serial.print("d1=");
+  // Serial.println(distance1);
+  // Serial.print("d2=");
+  // Serial.println(distance2);
+  // Serial.print("d3=");
+  // Serial.println(distance3);
   if (millis() - lastSendTrashPercentage > 1000 * 60 && WiFi.status() == WL_CONNECTED && distance1 != 0 && distance2 != 0 && distance3 != 0){
     float percentage1 = ((15.0f - (float)distance1) / 15.0f) * 100.0f;
     percentage1 = constrain(percentage1, 0, 100);
@@ -74,6 +74,9 @@ void loop() {
     float percentage3 = ((15.0f - (float)distance3) / 15.0f) * 100.0f;
     percentage3 = constrain(percentage3, 0, 100);
     sendTrashPercentage(percentage1, percentage2, percentage3);
+    if (percentage1 >= 100 || percentage2 >= 100 || percentage3 >= 100) {
+      sendQuickAlert();
+    }
     lastSendTrashPercentage = millis();
   }
 }
@@ -243,4 +246,32 @@ void getOpenCanRequest() {
         break;
     }
   }
+}
+
+void sendQuickAlert() {
+  const char* alertHost = "www.pushsafer.com";
+  const int httpsPort = 443;
+  const char* request = "/api?k=TocWNUNTEXwJHxjwRK0z&m=%5Bsize%3D24%5DC%E1%BA%A3nh%20b%C3%A1o%20th%C3%B9ng%20r%C3%A1c%20%C4%91%E1%BA%A7y%5B%2Fsize%5D%0AH%E1%BB%87%20th%E1%BB%91ng%20ph%C3%A1t%20hi%E1%BB%87n%20th%C3%B9ng%20r%C3%A1c%20b%E1%BA%A1n%20%C4%91%C3%A3%20%C4%91%E1%BA%A7y.%C2%A0%0AVui%20l%C3%B2ng%20d%E1%BB%8Dn%20d%E1%BA%B9p%20th%C3%B9ng%20r%C3%A1c%20c%E1%BB%A7a%20b%E1%BA%A1n";
+
+  WiFiClientSecure client;
+  client.setInsecure();
+  Serial.print("Connecting to ");
+  Serial.println(alertHost);
+
+  if (!client.connect(alertHost, httpsPort)) {
+    Serial.println("❌ HTTPS connection failed!");
+    return;
+  }
+
+  client.print(String("GET ") + request + " HTTP/1.1\r\n" +
+               "Host: " + alertHost + "\r\n" +
+               "User-Agent: ESP32\r\n" +
+               "Connection: close\r\n\r\n");
+
+  while (client.connected()) {
+    String line = client.readStringUntil('\n');
+    Serial.println(line);
+  }
+
+  client.stop();
 }
