@@ -11,27 +11,46 @@ const int port = 8000;
 
 unsigned long lastCheckOpenCanRequest = 0;
 unsigned long lastSendTrashPercentage = 0;
+unsigned long lastSendWeight = 0;
 
 Servo myservo1;
 Servo myservo2;
 Servo myservo3;
 
-int echo_pin_1 = 21;
+int echo_pin_1 = 34;
 int trig_pin_1 = 22;
 
-int echo_pin_2 = 23;
+int echo_pin_2 = 35;
 int trig_pin_2 = 25;
 
-int echo_pin_3 = 26;
+int echo_pin_3 = 36;
 int trig_pin_3 = 27;
 
+//Load cell 
+const int data_pin1 = 19; 
+const int clock_pin1 = 21; 
+long zero1 = 0;
+
+Q2HX711 hx711_1(1, clock_pin1);
+
+const int data_pin2 = 23; 
+const int clock_pin2 = 26; 
+long zero2 = 0;
+
+Q2HX711 hx711_2(data_pin2, clock_pin2);
+
+const int data_pin3 = 32; 
+const int clock_pin3 = 33; 
+long zero3 = 0;
+
+Q2HX711 hx711_3(data_pin3, clock_pin3);
 
 void setup() {
   Serial.begin(115200);
   wifiConnect();
-  myservo1.attach(17);
-  myservo2.attach(18);
-  myservo3.attach(19);
+  myservo1.attach(16);
+  myservo2.attach(17);
+  myservo3.attach(18);
   pinMode(trig_pin_1, OUTPUT);
   pinMode(echo_pin_1, INPUT);
 
@@ -40,6 +59,16 @@ void setup() {
 
   pinMode(trig_pin_3, OUTPUT);
   pinMode(echo_pin_3, INPUT);
+
+  for(int i = 0; i < 100; i++) {
+    zero1 = zero1 + (hx711_1.read()/100);
+    zero2 = zero2 + (hx711_2.read()/100);
+    zero3 = zero3 + (hx711_3.read()/100);
+  }
+
+  zero1 /= 100;
+  zero2 /= 100;
+  zero3 /= 100;
 }
 
 void loop() {
@@ -78,6 +107,17 @@ void loop() {
       sendQuickAlert();
     }
     lastSendTrashPercentage = millis();
+  }
+
+  //0G 86276
+  //8G 86281
+  long weight1 = ((hx711_1.read()/100) - zero)/0.625;;
+  long weight2 = ((hx711_2.read()/100) - zero)/0.625;;
+  long weight3 = ((hx711_3.read()/100) - zero)/0.625;;
+
+  if(millis() - lastSendWeight > 1000 * 60 && WiFi.status() == WL_CONNECTED && (weight1 != 0 && weight1 != 1) && (weight2 != 0 && weight2 != 1) && (weight3 != 0 && weight3 != 1)) {
+    sendTrashWeightPost(weight1, weight2, weight3);
+    lastSendWeight = millis();
   }
 }
 
