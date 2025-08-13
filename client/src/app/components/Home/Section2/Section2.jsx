@@ -30,7 +30,7 @@ export const Section2 = () => {
       <div className='mt-[100px] sm:mt-[200px] lg:mt-[350px] mb-[30px] lg:mb-[50px]'>
         <div className='mb-[10px] sm:mb-[50px]'>
           <div className="text-[16px] sm:text-[30px] lg:text-[40px] font-[600] text-[#505050] mb-[10px]" data-aos="fade-up">Smarter Networks, Smarter Decisions</div>
-          <div className="text-[10px] sm:text-[16px] lg:text-[18px] font-[300] text-[#505050] mb-[30px]" data-aos="fade-up" data-aos-delay="150">Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi consequatur ducimus ratione iusto nihil. Qui, reiciendis blanditiis consequuntur aut magnam a veritatis asperiores sequi distinctio soluta aperiam officiis nam assumenda.</div>
+          <div className="text-[10px] sm:text-[16px] lg:text-[18px] font-[300] text-[#505050] mb-[30px]" data-aos="fade-up" data-aos-delay="150">From sensors to dashboards — everything you need to connect, monitor, and scale your IoT ecosystem, with real-time insights, seamless integration, and full control at every level of your operation</div>
         </div>
         <div data-aos="fade-up">
           <Swiper

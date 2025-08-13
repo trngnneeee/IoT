@@ -10,6 +10,7 @@ export const MainPage = () => {
   const { isLogin, infoUser, isLoading } = useAuth();
   const [chartData, setChartData] = useState(null);
   const [tableData, setTableData] = useState(null);
+  const [countData, setCountData] = useState(null);
 
   useEffect(() => {
     if (!isLogin && !isLoading) router.push("/account/login");
@@ -50,10 +51,11 @@ export const MainPage = () => {
   useEffect(() => {
     const fetchData2 = () => {
       fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/can/get-req-stas`)
-      .then(res => res.json())
-      .then((data) => {
-        setTableData(data.data);
-      })
+        .then(res => res.json())
+        .then((data) => {
+          setTableData(data.data);
+          setCountData(data.count);
+        })
     }
 
     fetchData2();
@@ -66,9 +68,9 @@ export const MainPage = () => {
   return (
     <>
       {isLogin && chartData && (
-        <div className="ml-[350px] mr-[30px]">
+        <div className="ml-[350px] mr-[30px] pt-[100px]">
           <div className="flex justify-center items-center w-full py-[50px] gap-[50px]">
-            <div className="w-full max-w-3xl">
+            <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg p-[20px] border border-gray-300" data-aos="fade-up">
               {chartData && (
                 <LineChart
                   labels={chartData.labels}
@@ -78,26 +80,55 @@ export const MainPage = () => {
                 />
               )}
             </div>
-            <div className="overflow-x-auto border border-gray-300 rounded-lg shadow-lg">
-              <div className="text-center text-[20px] font-bold mb-[20px] text-gray-700">Open-can Statistics</div>
-              <table className="min-w-full divide-y divide-gray-200 text-center">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="px-[10px] py-3 text-[12px] font-bold text-gray-700">Name</th>
-                    <th className="px-[10px] py-3 text-[12px] font-bold text-gray-700">Date - Hour</th>
-                    <th className="px-[10px] py-3 text-[12px] font-bold text-gray-700">Count</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {tableData && tableData.map((item, index) => (
-                    <tr key={index}>
-                      <td className="px-[10px] text-[11px] py-3 whitespace-nowrap">{item.name}</td>
-                      <td className="px-[10px] text-[11px] py-3 whitespace-nowrap">{new Date(item.date).toLocaleString()}</td>
-                      <td className="px-[10px] text-[11px] py-3 whitespace-nowrap">{item.count}</td>
+            <div className="flex flex-col gap-[20px] w-full max-w-md">
+              <div className="overflow-x-auto border border-gray-300 rounded-lg shadow-lg" data-aos="fade-up">
+                <div className="text-center text-[14px] font-bold text-gray-700 py-[10px] bg-gray-100 border-b-[1px] border-gray-300">Open-can History</div>
+                <table className="min-w-full divide-y divide-gray-200 text-center">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-[10px] py-3 text-[12px] font-bold text-gray-700">Name</th>
+                      <th className="px-[10px] py-3 text-[12px] font-bold text-gray-700">Date - Hour</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                </table>
+
+                <div className="max-h-[200px] overflow-y-auto overflow-x-hidden">
+                  <table className="min-w-full divide-y divide-gray-200 text-center">
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {tableData && tableData.map((item, index) => (
+                        <tr key={index}>
+                          <td className="px-[10px] text-[11px] py-3 whitespace-nowrap">{item.name}</td>
+                          <td className="px-[10px] text-[11px] py-3 whitespace-nowrap">{new Date(item.date).toLocaleString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="overflow-x-auto border border-gray-300 rounded-lg shadow-lg" data-aos="fade-up" data-aos-delay="200">
+                <div className="text-center text-[14px] font-bold text-gray-700 py-[10px] bg-gray-100 border-b-[1px] border-gray-300">Open-can Statistics</div>
+                <table className="min-w-full divide-y divide-gray-200 text-center">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-[10px] py-3 text-[12px] font-bold text-gray-700">Name</th>
+                      <th className="px-[10px] py-3 text-[12px] font-bold text-gray-700">Count</th>
+                    </tr>
+                  </thead>
+                </table>
+
+                <div className="max-h-[200px] overflow-y-auto overflow-x-hidden">
+                  <table className="min-w-full divide-y divide-gray-200 text-center">
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {countData && countData.map((item, index) => (
+                        <tr key={index}>
+                          <td className="w-[150px] px-[10px] text-[11px] py-3">{item.name}</td>
+                          <td className="w-[150px] px-[10px] text-[11px] py-3">{item.count}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -22,7 +22,7 @@ module.exports.registerPost = async (req, res) => {
   const hashPassword = bcrypt.hashSync(req.body.password, salt);
   req.body.password = hashPassword;
 
-  req.body.status = "initial";
+  req.body.status = "active";
 
   const newRecord = new AdminAccount(req.body);
   await newRecord.save();

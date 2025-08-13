@@ -10,10 +10,10 @@ export const MainPage = () => {
   useEffect(() => {
     const fetchData = () => {
       fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/trash/trash-volume`)
-      .then((res) => res.json())
-      .then((data) => {
-        setTrashVolume(data.data[data.data.length - 1]);
-      })
+        .then((res) => res.json())
+        .then((data) => {
+          setTrashVolume(data.data[data.data.length - 1]);
+        })
     }
     fetchData();
 
@@ -80,10 +80,10 @@ export const MainPage = () => {
               </div>
             </div>
           </div>
-          <div className="flex justify-center mt-[50px]">
+          <div className="mt-[30px] flex justify-center mx-[50px]">
             <OpenCanButton
-              bgColor={"#7E4F50"}
-              hoverBg={"#7e4f50a8"}
+              bgColor={"#66655F"}
+              hoverBg={"#66655fb0"}
               id={4}
             />
           </div>

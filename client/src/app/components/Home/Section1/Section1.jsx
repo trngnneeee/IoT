@@ -10,8 +10,8 @@ export const Section1 = () => {
     <>
       <div className="flex items-center gap-[10px] sm:gap-[30px] lg:gap-[50px]">
         <div className="w-[60%]">
-          <div className="text-[16px] sm:text-[30px] lg:text-[40px] font-[600] text-[#505050] mb-[10px]" data-aos="fade-up">Smart IoT Solutions for a Smarter Future</div>
-          <div className="text-[10px] sm:text-[16px] lg:text-[18px] font-[300] text-[#505050] mb-[10px] sm:mb-[30px]" data-aos="fade-up" data-aos-delay="150">From sensors to dashboards — everything you need to connect, monitor, and scale your IoT ecosystem, with real-time insights, seamless integration, and full control at every level of your operation</div>
+          <div className="text-[16px] sm:text-[30px] lg:text-[40px] font-[600] text-[#505050] mb-[10px]" data-aos="fade-up">Smart Bin for a Smarter Future</div>
+          <div className="text-[10px] sm:text-[16px] lg:text-[18px] font-[300] text-[#505050] mb-[10px] sm:mb-[30px]" data-aos="fade-up" data-aos-delay="150">Smart WasteBin System: Monitor, Classify, and Optimize Waste Disposal</div>
           <div className="flex gap-[10px] lg:gap-[20px] items-center" data-aos="fade-up" data-aos-delay="300">
             <Link href={isLogin ? "/dashboard" : "/account/login"} className="bg-[#505050] hover:bg-[#505050bd] text-white px-[10px] sm:px-[20px] py-[10px] rounded-[8px] text-[10px] lg:text-[20px] font-[600]" title={isLogin ? "Dashboard" : "Login"}>
               {isLogin ? "Dashboard" : "Getting Started"}

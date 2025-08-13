@@ -1,4 +1,4 @@
-const { raw } = require("express");
+const mongoose = require("mongoose");
 const OpenCan = require("../model/open-can.model");
 const AdminAccount = require("../model/admin-account.model");
 
@@ -23,13 +23,7 @@ module.exports.openCan = async (req, res) => {
 module.exports.sendReq = async (req, res) => {
   const rawData = await OpenCan.findOne({
     pressed: false
-  })
-
-  const count = await OpenCan.countDocuments();
-  if (count > 10)
-  {
-    await OpenCan.findOneAndDelete({});
-  }
+  });
 
   if (rawData)
   {
@@ -55,30 +49,32 @@ module.exports.sendReq = async (req, res) => {
 }
 
 module.exports.getStas = async (req, res) => {
-  const rawData = await OpenCan.find({});
+  const rawData = await OpenCan.find({ pressed: true }).sort({ date: -1 });
   const data = [];
-  const seen = new Set();
-  for (const item of rawData)
-  {
-    if (seen.has(item.pressedBy)) continue;
-    seen.add(item.pressedBy);
-    const userInfo = await AdminAccount.findOne({
-      _id: item.pressedBy
-    })
-    const numPressed = await OpenCan.countDocuments({
-      pressedBy: item.pressedBy
-    })
+  for (const item of rawData) {
+    const userInfor = await AdminAccount.findOne({ _id: item.pressedBy });
+    if (!userInfor) continue;
+
     data.push({
-      userId: item.pressedBy,
-      name: userInfo.fullName,
-      date: item.date,
-      count: numPressed
-    })
+      name: userInfor.fullName,
+      date: item.date
+    });
   }
-  
+
+  const countArr = [];
+  const adminAccountList = await AdminAccount.find({});
+  for (const item of adminAccountList) {
+    const count = await OpenCan.countDocuments({ pressedBy: item._id });
+    countArr.push({
+      name: item.fullName,
+      count: count
+    });
+  }
+
   res.json({
     code: "success",
-    message: "Get stats successfully!",
-    data: data
-  })
-}
+    message: "Get Open-can status successfully!",
+    data: data,
+    count: countArr
+  });
+};
