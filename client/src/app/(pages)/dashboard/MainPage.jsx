@@ -67,8 +67,9 @@ export const MainPage = () => {
 
   return (
     <>
+      <div className="text-[36px] font-semibold mb-[30px] ml-[350px] pt-[20px] text-center" data-aos="fade-up">Dashboard</div>
       {isLogin && chartData && (
-        <div className="ml-[350px] mr-[30px] pt-[100px]">
+        <div className="ml-[350px] mr-[30px]">
           <div className="flex justify-center items-center w-full py-[50px] gap-[50px]">
             <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg p-[20px] border border-gray-300" data-aos="fade-up">
               {chartData && (

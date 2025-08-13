@@ -6,6 +6,7 @@ import { IoMdSettings } from "react-icons/io";
 import { usePathname, useRouter } from "next/navigation";
 import { IoPowerSharp } from "react-icons/io5";
 import { AiOutlineHome } from "react-icons/ai";
+import { FaUser } from "react-icons/fa";
 import Swal from "sweetalert2"
 
 export const Sider = () => {
@@ -49,6 +50,10 @@ export const Sider = () => {
           </Link>
         </div>
         <div className="mt-[20px]">
+          <Link href="/profile" className={"flex items-center gap-[20px] hover:bg-[#4880FF] hover:text-white px-[15px] py-[10px] rounded-[8px] mb-[10px] mx-[20px] " + (pathName.startsWith("/profile") ? 'bg-[#4880FF] text-white' : '')}>
+            <FaUser className="text-[25px]" />
+            <div className="text-[18px] font-medium">Profile</div>
+          </Link>
           <Link href="#" className="flex items-center gap-[20px] text-[#F93C65] px-[15px] py-[10px] rounded-[8px] mx-[20px]" onClick={handleLogout}>
             <IoPowerSharp className="text-[25px]" />
             <div className="text-[18px] font-medium">Logout</div>
