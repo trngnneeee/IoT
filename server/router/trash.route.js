@@ -12,4 +12,9 @@ router.get(
   trashController.trashVolumeGet
 )
 
+router.post(
+  "/trash-weight",
+  trashController.trashWeightPost
+)
+
 module.exports = router;

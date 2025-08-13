@@ -248,6 +248,42 @@ void getOpenCanRequest() {
   }
 }
 
+void sendTrashWeightPost(float w1, float w2, float w3){
+  WiFiClient client;
+
+  if (!client.connect(host, port)) {
+    Serial.println("❌ Cannot connect to host:port");
+    return;
+  }
+
+  String jsonData = "{";
+  jsonData += "\"w1\": " + String(w1, 2) + ",";
+  jsonData += "\"w2\": " + String(w2, 2) + ",";
+  jsonData += "\"w3\": " + String(w3, 2);
+  jsonData += "}";
+
+  Serial.print("✅ Sending JSON: ");
+  Serial.println(jsonData);
+
+  client.println("POST /trash/trash-weight HTTP/1.1");
+  client.println("Host: " + String(host));
+  client.println("Content-Type: application/json");
+  client.println("Connection: close");
+  client.print("Content-Length: ");
+  client.println(jsonData.length());
+  client.println();
+  client.println(jsonData);
+
+  while (client.connected()) {
+    while (client.available()) {
+      String line = client.readStringUntil('\n');
+      Serial.println(line);
+    }
+  }
+
+  client.stop();
+}
+
 void sendQuickAlert() {
   const char* alertHost = "www.pushsafer.com";
   const int httpsPort = 443;

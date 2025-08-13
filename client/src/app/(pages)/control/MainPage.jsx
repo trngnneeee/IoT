@@ -6,13 +6,15 @@ import { useEffect, useState } from "react";
 
 export const MainPage = () => {
   const [trashVolume, setTrashVolume] = useState(null);
+  const [trashWeight, setTrashWeight] = useState(null);
 
   useEffect(() => {
     const fetchData = () => {
       fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/trash/trash-volume`)
         .then((res) => res.json())
         .then((data) => {
-          setTrashVolume(data.data[data.data.length - 1]);
+          setTrashVolume(data.trashVolume[data.trashVolume.length - 1]);
+          setTrashWeight(data.trashWeight);
         })
     }
     fetchData();
@@ -32,7 +34,7 @@ export const MainPage = () => {
               <div className="mt-[30px] w-full">
                 <div className="flex flex-col justify-center items-center mb-[30px]">
                   <div className="text-[18px] font-bold">{`Percentage of trash: ${trashVolume.percentage1}%`}</div>
-                  <div className="text-[18px] font-bold">Trash volume: 1.5kg</div>
+                  <div className="text-[18px] font-bold">Trash volume: {trashWeight ? `${trashWeight.w1}kg` : "kg"}</div>
                 </div>
                 <div className="flex justify-center mb-[25px]">
                   <OpenCanButton
@@ -50,7 +52,7 @@ export const MainPage = () => {
               <div className="mt-[30px] w-full">
                 <div className="flex flex-col justify-center items-center mb-[30px]">
                   <div className="text-[18px] font-bold">{`Percentage of trash: ${trashVolume.percentage2}%`}</div>
-                  <div className="text-[18px] font-bold">Trash volume: 1.5kg</div>
+                  <div className="text-[18px] font-bold">Trash volume: {trashWeight ? `${trashWeight.w2}kg` : "kg"}</div>
                 </div>
                 <div className="flex justify-center mb-[25px]">
                   <OpenCanButton
@@ -68,7 +70,7 @@ export const MainPage = () => {
               <div className="mt-[30px] w-full">
                 <div className="flex flex-col justify-center items-center mb-[30px]">
                   <div className="text-[18px] font-bold">{`Percentage of trash: ${trashVolume.percentage3}%`}</div>
-                  <div className="text-[18px] font-bold">Trash volume: 1.5kg</div>
+                  <div className="text-[18px] font-bold">Trash volume: {trashWeight ? `${trashWeight.w3}kg` : "kg"}</div>
                 </div>
                 <div className="flex justify-center mb-[25px]">
                   <OpenCanButton

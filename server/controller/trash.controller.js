@@ -1,6 +1,7 @@
 const TrashVolume = require("../model/trash.model");
 const mailHelper = require("../helper/mail.helper");
 const AdminAccount = require("../model/admin-account.model");
+const TrashWeight = require("../model/trash-weight.model");
 
 const sendWarningEmail = async (id, p) => {
   const adminAccount = await AdminAccount.find({});
@@ -34,13 +35,10 @@ module.exports.trashVolumePost = async (req, res) => {
   const now = new Date();
   const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
 
-  // Xóa các bản ghi cũ hơn 10 phút
-  await TrashVolume.deleteMany({ date: { $lt: tenMinutesAgo } });
-
-  // Đếm số bản ghi hiện tại còn lại (từ 10 phút trước tới giờ)
+  // Đếm số bản ghi trong 10 phút gần nhất
   const count = await TrashVolume.countDocuments({ date: { $gte: tenMinutesAgo } });
 
-  // Nếu còn >= 10 bản ghi, xóa bản ghi cũ nhất
+  // Nếu đã đủ 10 bản ghi thì xóa bản ghi cũ nhất để chừa chỗ cho bản ghi mới
   if (count >= 10) {
     const oldest = await TrashVolume.findOne({ date: { $gte: tenMinutesAgo } }).sort({ date: 1 });
     if (oldest) {
@@ -52,10 +50,10 @@ module.exports.trashVolumePost = async (req, res) => {
     sendWarningEmail(1, req.body.percentage1);
   }
   if (req.body.percentage2 >= 100) {
-    sendWarningEmail(2, req.body.percentage1);
+    sendWarningEmail(2, req.body.percentage2);
   }
   if (req.body.percentage3 >= 100) {
-    sendWarningEmail(3, req.body.percentage1);
+    sendWarningEmail(3, req.body.percentage3);
   }
 
   await TrashVolume.create({
@@ -72,19 +70,41 @@ module.exports.trashVolumePost = async (req, res) => {
 };
 
 module.exports.trashVolumeGet = async (req, res) => {
-  const rawData = await TrashVolume.find({});
-  const data = [];
-  rawData.forEach((item) => {
-    data.push({
+  const rawTrashVolume = await TrashVolume.find({});
+  const trashVolume = [];
+  rawTrashVolume.forEach((item) => {
+    trashVolume.push({
       hour: new Date(item.date).toISOString(),
       percentage1: item.percentage1,
       percentage2: item.percentage2,
       percentage3: item.percentage3
     })
   })
+  const rawTrashWeight = await TrashWeight.findOne({});
   res.json({
     code: "success",
     message: "Get data successfully!",
-    data: data
+    trashVolume: trashVolume,
+    trashWeight: rawTrashWeight
   })
 };
+
+module.exports.trashWeightPost = async (req, res) => {
+  const newRecord = new TrashWeight(req.body);
+  const existRecord = await TrashWeight.findOne({});
+  if (existRecord)
+  {
+    existRecord.w1 = req.body.w1;
+    existRecord.w2 = req.body.w2;
+    existRecord.w3 = req.body.w3;
+    await existRecord.save();
+  }
+  else
+  {
+    await newRecord.save();
+  }
+  res.json({
+    code: "success",
+    message: "Trash weight saved successfully!"
+  });
+}

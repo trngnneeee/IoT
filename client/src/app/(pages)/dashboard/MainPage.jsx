@@ -21,7 +21,7 @@ export const MainPage = () => {
       fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/trash/trash-volume`)
         .then(res => res.json())
         .then((data) => {
-          const labels = data.data.map(item =>
+          const labels = data.trashVolume.map(item =>
             new Date(item.hour).toLocaleString([], {
               day: "2-digit",
               month: "2-digit",
@@ -30,9 +30,9 @@ export const MainPage = () => {
               hour12: false
             })
           )
-          const dataPoints1 = data.data.map(item => item.percentage1);
-          const dataPoints2 = data.data.map(item => item.percentage2);
-          const dataPoints3 = data.data.map(item => item.percentage3);
+          const dataPoints1 = data.trashVolume.map(item => item.percentage1);
+          const dataPoints2 = data.trashVolume.map(item => item.percentage2);
+          const dataPoints3 = data.trashVolume.map(item => item.percentage3);
 
           setChartData({
             labels,
