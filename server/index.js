@@ -7,6 +7,7 @@ require('dotenv').config()
 const port = 8000
 
 const indexRoute = require("./router/index.route");
+const chatRoute = require("./router/chat.route");
 
 mongoose.connect(process.env.DATABASE)
   .then(() => console.log('✅ Connected to MongoDB'))
@@ -22,6 +23,7 @@ app.use(cors({
 }));
 
 app.use("/", indexRoute);
+app.use("/chatbot", chatRoute);
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`App listening on port ${port}`)
