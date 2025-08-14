@@ -1,178 +1,258 @@
 const { getDB } = require("./db");
 
-async function getLatestReading(binId) {
+const index_name_bin = {
+  organic: 1,
+  recyclable: 2,
+  landfill: 3
+};
+
+function getBinName(keyOrIndex) {
+  const names = { organic: "hữu cơ", recyclable: "tái chế", landfill: "chôn lấp" };
+  const reverse = { 1: "organic", 2: "recyclable", 3: "landfill" };
+  if (typeof keyOrIndex === "number") return names[reverse[keyOrIndex]] || `Bin ${keyOrIndex}`;
+  return names[keyOrIndex] || String(keyOrIndex);
+}
+
+/** ---------- % đầy (trash-volume) ---------- **/
+async function getLatestReading(binId /* organic|recyclable|landfill */) {
   try {
-    const col = (await getDB()).collection("bin_readings");
-    const doc = await col.find({ binId }).sort({ createdAt: -1 }).limit(1).next();
+    console.log(`getLatestReading: binId=${binId}`);
+    const binIndex = index_name_bin[binId];
+    if (!binIndex) throw new Error(`binId không hợp lệ: ${binId}`);
 
-    if (doc) {
-      if (doc.fillPct === undefined && doc.distanceCm !== undefined && doc.binHeightCm !== undefined) {
-        doc.fillPct = computeFillPct(doc);
-      }
-      doc.binName = getBinName(binId);
+    const db = await getDB();
+    const vol = db.collection("trash-volume");
 
-      const now = new Date();
-      const ageMs = now.getTime() - doc.createdAt.getTime();
-      const ageHours = ageMs / (1000 * 60 * 60);
-      doc.dataAge = {
+    // Lấy record mới nhất theo 'date'
+    const doc = await vol.find({}).sort({ date: -1 }).limit(1).next();
+    if (!doc) return null;
+
+    const key = `percentage${binIndex}`;
+    const fillPct = (typeof doc[key] === "number") ? doc[key] : null;
+
+    const ts = doc.date ? new Date(doc.date) : null;
+    const ageHours = ts ? (Date.now() - ts.getTime()) / 36e5 : null;
+
+    return {
+      binId,
+      binName: getBinName(binId),
+      fillPct,
+      allPercentages: {
+        p1: doc.percentage1,
+        p2: doc.percentage2,
+        p3: doc.percentage3
+      },
+      date: ts,
+      dataAge: (ageHours == null) ? null : {
         hours: Math.round(ageHours * 10) / 10,
         isRecent: ageHours < 1,
         isStale: ageHours > 24
-      };
-    }
-    return doc;
-  } catch (error) {
-    console.error(`Error getting latest reading for bin ${binId}:`, error);
+      },
+      _id: doc._id
+    };
+  } catch (err) {
+    console.error(`Error getting latest reading for bin ${binId}:`, err);
     return null;
   }
 }
 
-function computeFillPct(doc) {
-  if (!doc) return null;
+async function getAllLatestReadings() {
   try {
-    if (typeof doc.distanceCm === "number" && typeof doc.binHeightCm === "number" && doc.binHeightCm > 0) {
-      const pct = Math.round(((doc.binHeightCm - doc.distanceCm) / doc.binHeightCm) * 100);
-      return Math.max(0, Math.min(100, pct));
-    }
-    return typeof doc.fillPct === "number" ? doc.fillPct : null;
-  } catch (error) {
-    console.error("Error computing fill percentage:", error);
-    return null;
+    const db = await getDB();
+    const vol = db.collection("trash-volume");
+    const doc = await vol.find({}).sort({ date: -1 }).limit(1).next();
+    if (!doc) return [];
+
+    const ts = doc.date ? new Date(doc.date) : null;
+    const ageHours = ts ? (Date.now() - ts.getTime()) / 36e5 : null;
+
+    const common = {
+      date: ts,
+      dataAge: (ageHours == null) ? null : {
+        hours: Math.round(ageHours * 10) / 10,
+        isRecent: ageHours < 1,
+        isStale: ageHours > 24
+      },
+      _id: doc._id
+    };
+
+    return [1,2,3].map(i => ({
+      binId: i,
+      binName: getBinName(i),
+      fillPct: doc[`percentage${i}`] ?? null,
+      ...common
+    }));
+  } catch (err) {
+    console.error("Error getting all latest readings:", err);
+    return [];
   }
 }
 
-async function getStatusAll(bins = ["plastic", "organic", "metal"]) {
+/** ---------- Trạng thái tổng hợp ---------- **/
+function getBinStatus(data) {
+  if (!data || data.fillPct == null) return "unknown (không biết)";
+  if (data.fillPct >= 80) return "critical (nguy cấp)";
+  if (data.fillPct >= 70) return "warning (cảnh báo)";
+  if (data.fillPct >= 50) return "moderate (vừa phải)";
+  return "good (tốt)";
+}
+
+function getBinRecommendation(data) {
+  if (!data) return "Không có dữ liệu";
+  const s = getBinStatus(data);
+  if (s === "critical (nguy cấp)") return "Cần dọn gấp - thùng đã đầy 80%+";
+  if (s === "warning (cảnh báo)")  return "Cần dọn sớm - thùng đã đầy 70%+";
+  if (s === "moderate (vừa phải)") return "Thùng đang hoạt động bình thường";
+  return "Thùng còn nhiều chỗ trống";
+}
+
+function getOverallHealth(results) {
+  const critical = results.filter(r => r.data?.status === "critical (nguy cấp)").length;
+  const warning  = results.filter(r => r.data?.status === "warning (cảnh báo)").length;
+  if (critical > 0) return "critical (nguy cấp)";
+  if (warning  > 0) return "warning (cảnh báo)";
+  return "good (tốt)";
+}
+
+async function getStatusAll(bins = ["organic", "recyclable", "landfill"]) {
   try {
-    const out = {};
-    const results = await Promise.all(bins.map(async b => {
-      const data = await getLatestReading(b);
+    const results = await Promise.all(bins.map(async binId => {
+      const data = await getLatestReading(binId);
       if (data) {
-        data.status = getBinStatus(data);
+        // Lấy % đầy và tình trạng
+        data.status = getBinStatus(data); // ví dụ: "normal", "warning", "critical"
         data.recommendation = getBinRecommendation(data);
       }
-      return { bin: b, data };
+      return {
+        binId,
+        binName: getBinName(binId),
+        fillPct: data?.fillPct ?? null,
+        status: data?.status ?? "unknown"
+      };
     }));
-
-    results.forEach(({ bin, data }) => {
-      out[bin] = data;
-    });
-
-    out.systemStatus = {
+    console.log("getStatusAll: results", results);
+    return {
+      bins: results,
       totalBins: bins.length,
-      activeBins: results.filter(r => r.data).length,
-      criticalBins: results.filter(r => r.data && r.data.status === 'critical').length,
+      activeBins: results.filter(r => r.fillPct !== null).length,
+      criticalBins: results.filter(r => r.status === "critical").length,
       lastUpdate: new Date(),
       overallHealth: getOverallHealth(results)
     };
-
-    return out;
-  } catch (error) {
-    console.error("Error getting status all:", error);
+  } catch (err) {
+    console.error("Error getting status all:", err);
     return {};
   }
 }
 
-async function getSummary(hours = 24) {
+/** ---------- Khối lượng (trash-weight) ---------- **
+ * Hiện collection chỉ có 1 doc duy nhất với w1/w2/w3 → lấy doc mới nhất theo _id
+ */
+async function getLatestWeights() {
   try {
-    const col = (await getDB()).collection("bin_readings");
-    const since = new Date(Date.now() - hours * 3600 * 1000);
-
-    const pipeline = [
-      { $match: { createdAt: { $gte: since } } },
-      { $group: {
-        _id: "$binId",
-        weightKg: { $max: "$weightKg" },
-        avgWeightKg: { $avg: "$weightKg" },
-        readings: { $sum: 1 },
-        lastUpdate: { $max: "$createdAt" }
-      }},
-      { $sort: { _id: 1 } }
-    ];
-
-    const results = await col.aggregate(pipeline).toArray();
-
-    const totalWeight = results.reduce((sum, item) => sum + (item.weightKg || 0), 0);
-    const avgWeight = results.reduce((sum, item) => sum + (item.avgWeightKg || 0), 0) / results.length;
-
+    const db = await getDB();
+    const col = db.collection("trash-weight");
+    const doc = await col.find({}).sort({ _id: -1 }).limit(1).next();
+    if (!doc) return null;
     return {
-      period: `${hours} giờ`,
-      bins: results,
-      summary: {
-        totalWeight: Math.round(totalWeight * 100) / 100,
-        averageWeight: Math.round(avgWeight * 100) / 100,
-        totalReadings: results.reduce((sum, item) => sum + item.readings, 0),
-        binCount: results.length
-      }
+      w1: doc.w1 ?? null,
+      w2: doc.w2 ?? null,
+      w3: doc.w3 ?? null,
+      _id: doc._id
     };
-  } catch (error) {
-    console.error("Error getting summary:", error);
-    return { error: "Không thể lấy dữ liệu tổng kết" };
+  } catch (err) {
+    console.error("Error getting latest weights:", err);
+    return null;
   }
 }
 
-async function getHistory(binId, hours = 24) {
+/** getSummary(): tổng hợp nhanh trọng lượng hiện tại (vì không có lịch sử thời gian) */
+async function getSummary() {
   try {
-    const col = (await getDB()).collection("bin_readings");
+    const weights = await getLatestWeights();
+    const vols = await getLatestReading("organic");
+    if (!weights) return { error: "Không có dữ liệu cân nặng" };
+    if (!vols) return { error: "Không có dữ liệu dung lượng rác trong thùng" };
+    const bins = [
+      { _id: 1, weightKg: weights.w1 ?? 0, trash_vol: vols.allPercentages.p1 ?? 0 },
+      { _id: 2, weightKg: weights.w2 ?? 0, trash_vol: vols.allPercentages.p2 ?? 0 },
+      { _id: 3, weightKg: weights.w3 ?? 0, trash_vol: vols.allPercentages.p3 ?? 0 },
+    ];
+    const totalWeight = bins.reduce((s,b)=>s+(b.weightKg||0),0);
+    const avgWeight = totalWeight / bins.length;
+    console.log(`getSummary: tổng trọng lượng ${totalWeight} kg, trung bình ${avgWeight} kg`);
+    return {
+      period: "hiện tại",
+      bins,
+      summary: {
+        totalWeight: Math.round(totalWeight * 100) / 100,
+        averageWeight: Math.round(avgWeight * 100) / 100,
+        totalReadings: 1,
+        binCount: bins.length,
+        weight: {
+          min: Math.min(...bins.map(b => b.weightKg)),
+          max: Math.max(...bins.map(b => b.weightKg)),
+          avg: Math.round(avgWeight * 100) / 100
+        }
+      }
+    };
+  } catch (err) {
+    console.error("Error getting summary:", err);
+    return { error: "Không thể lấy dữ liệu tổng kết" };
+  }
+}
+/** Lịch sử cân nặng */ 
+async function getHistoryVolume(binId, hours = 24) {
+  try {
+    const db = await getDB();
+    const col = db.collection("trash-volume");
+
     const since = new Date(Date.now() - hours * 3600 * 1000);
+    const binIndex = index_name_bin[binId];
+    if (!binIndex) throw new Error(`binId không hợp lệ: ${binId}`);
 
-    const results = await col.find({ binId, createdAt: { $gte: since } })
-      .project({ weightKg: 1, distanceCm: 1, binHeightCm: 1, createdAt: 1, fillPct: 1 })
-      .sort({ createdAt: 1 })
-      .limit(500)
+    const key = `percentage${binIndex}`;
+
+    const results = await col.find({ date: { $gte: since } })
+      .project({ [key]: 1, date: 1 })
+      .sort({ date: 1 })
       .toArray();
-
-    if (results.length === 0) {
-      return { binId, period: `${hours} giờ`, data: [], message: "Không có dữ liệu lịch sử" };
-    }
-
-    const trends = calculateTrends(results);
 
     return {
       binId,
       binName: getBinName(binId),
       period: `${hours} giờ`,
-      data: results,
-      trends,
-      summary: {
-        totalReadings: results.length,
-        weightRange: {
-          min: Math.min(...results.map(r => r.weightKg || 0)),
-          max: Math.max(...results.map(r => r.weightKg || 0)),
-          current: results[results.length - 1]?.weightKg || 0
-        },
-        fillRange: {
-          min: Math.min(...results.map(r => r.fillPct || 0)),
-          max: Math.max(...results.map(r => r.fillPct || 0)),
-          current: results[results.length - 1]?.fillPct || 0
-        }
-      }
+      data: results.map(r => ({
+        date: r.date,
+        fillPct: r[key]
+      })),
+      totalReadings: results.length
     };
-  } catch (error) {
-    console.error(`Error getting history for bin ${binId}:`, error);
-    return { error: "Không thể lấy dữ liệu lịch sử" };
+  } catch (err) {
+    console.error(`Error getting volume history for bin ${binId}:`, err);
+    return { error: "Không thể lấy dữ liệu lịch sử % đầy" };
   }
 }
 
+/** ---------- Hàng đợi mở nắp (open-can) ---------- **/
 async function enqueueOpen(binId) {
   try {
-    const col = (await getDB()).collection("commands");
+    const db = await getDB();
+    const col = db.collection("open-can"); // đúng tên collection
     const doc = {
-      deviceId: "esp32-main",
-      action: "open",
-      binId,
-      status: "pending",
-      createdAt: new Date(),
-      priority: "normal"
+      id: Number(index_name_bin[binId]), // 1|2|3
+      pressedBy: "",                     // có thể ghi userId
+      pressed: false,
+      date: new Date()
     };
-    await col.insertOne(doc);
+    const result = await col.insertOne(doc);
 
-    console.log(`[Command] Queued open command for bin ${binId}`);
-
+    console.log(`[Open can] Queued open command for bin ${binId}`);
     return {
       success: true,
       message: `Đã gửi lệnh mở thùng ${getBinName(binId)}`,
-      commandId: doc._id,
-      timestamp: doc.createdAt
+      commandId: result.insertedId,
+      timestamp: doc.date
     };
   } catch (error) {
     console.error(`Error enqueueing open command for bin ${binId}:`, error);
@@ -180,93 +260,17 @@ async function enqueueOpen(binId) {
   }
 }
 
-function getBinName(binId) {
-  const binNames = {
-    "plastic": "nhựa",
-    "organic": "hữu cơ",
-    "metal": "kim loại",
-    "paper": "giấy"
-  };
-  return binNames[binId] || binId;
-}
-
-function getBinStatus(data) {
-  if (!data) return 'unknown';
-  if (data.fillPct >= 90) return 'critical';
-  if (data.fillPct >= 75) return 'warning';
-  if (data.fillPct >= 50) return 'moderate';
-  return 'good';
-}
-
-function getBinRecommendation(data) {
-  if (!data) return 'Không có dữ liệu';
-  const status = getBinStatus(data);
-  switch (status) {
-    case 'critical':
-      return 'Cần dọn gấp - thùng đã đầy 90%+';
-    case 'warning':
-      return 'Cần dọn sớm - thùng đã đầy 75%+';
-    case 'moderate':
-      return 'Thùng đang hoạt động bình thường';
-    default:
-      return 'Thùng còn nhiều chỗ trống';
-  }
-}
-
-function getOverallHealth(results) {
-  const criticalCount = results.filter(r => r.data && r.data.status === 'critical').length;
-  const warningCount = results.filter(r => r.data && r.data.status === 'warning').length;
-  if (criticalCount > 0) return 'critical';
-  if (warningCount > 0) return 'warning';
-  return 'good';
-}
-
-function calculateTrends(data) {
-  if (data.length < 2) return { message: "Không đủ dữ liệu để tính xu hướng" };
-  try {
-    const weights = data.map(d => d.weightKg || 0).filter(w => w > 0);
-    if (weights.length < 2) return { message: "Không đủ dữ liệu khối lượng để tính xu hướng" };
-
-    const firstHalf = weights.slice(0, Math.floor(weights.length / 2));
-    const secondHalf = weights.slice(Math.floor(weights.length / 2));
-
-    const avgFirst = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
-    const avgSecond = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
-
-    const change = avgSecond - avgFirst;
-    const changePercent = (change / avgFirst) * 100;
-
-    let trend = 'stable';
-    if (changePercent > 10) trend = 'increasing';
-    else if (changePercent < -10) trend = 'decreasing';
-
-    return {
-      trend,
-      change: Math.round(change * 100) / 100,
-      changePercent: Math.round(changePercent * 100) / 100,
-      message: getTrendMessage(trend, changePercent)
-    };
-  } catch (error) {
-    return { message: "Không thể tính xu hướng", error: String(error) };
-  }
-}
-
-function getTrendMessage(trend, changePercent) {
-  switch (trend) {
-    case 'increasing':
-      return `Khối lượng đang tăng (${changePercent > 0 ? '+' : ''}${changePercent.toFixed(1)}%)`;
-    case 'decreasing':
-      return `Khối lượng đang giảm (${changePercent.toFixed(1)}%)`;
-    default:
-      return 'Khối lượng ổn định';
-  }
-}
-
 module.exports = {
+  // % đầy
   getLatestReading,
-  computeFillPct,
+  getAllLatestReadings,
   getStatusAll,
+
+  // cân nặng
+  getLatestWeights,
   getSummary,
-  getHistory,
+  getHistoryVolume,
+
+  // điều khiển
   enqueueOpen
 };

@@ -1,33 +1,67 @@
 const router = require('express').Router();
+
 const { safeInput } = require("../utils/guard");
 const { classify } = require("../nlu/classify");
-const TOOL_REGISTRY = require("../tools");
+
+// Cho phép cả 2 kiểu export của tools:
+//   module.exports = TOOL_REGISTRY
+//   module.exports.TOOL_REGISTRY = TOOL_REGISTRY
+const toolsMod = require("../tools");
+const TOOL_REGISTRY = toolsMod?.TOOL_REGISTRY ?? toolsMod;
+
 const { callEnhancedLLM, llmDirectAnswer } = require("../llm/enhanced-ollama");
 const { ToolCallSchema, ArgsSchemas } = require("../llm/schemas");
 const { conversationManager } = require("../utils/conversation");
-const { ResponseFormatter } = require("../utils/formatter");
 const fetch = require("node-fetch");
 
-// Bật/tắt LLM bằng .env (mặc định bật)
-let LLM_AVAILABLE = process.env.USE_LLM !== "0";
-// Ngưỡng tự tin để quyết định fallback trả lời tự nhiên
-const CONF_TH = Number(process.env.LLM_CONF_THRESHOLD || "0.65");
-
-(async () => {
-  if (!LLM_AVAILABLE) return;
+// --- Formatter: tự tìm formatResponse hoặc ResponseFormatter.formatResponse, có fallback ---
+let formatResponseFn = null;
+try {
+  const fmt = require("../utils/formatter");
+  // formatter có thể export default là class, hoặc { ResponseFormatter }
+  const FormatterClass =
+    fmt?.ResponseFormatter          // named export
+    || fmt?.default                 // default export (nếu dùng transpile)
+    || fmt;                         // module.exports = ResponseFormatter
+  if (FormatterClass?.formatResponse) {
+    // bind để 'this' bên trong static method trỏ về class
+    formatResponseFn = FormatterClass.formatResponse.bind(FormatterClass);
+  } else if (typeof fmt?.formatResponse === "function") {
+    // nếu export sẵn function thuần thì vẫn bind để an toàn
+    formatResponseFn = fmt.formatResponse.bind(fmt);
+  }
+} catch { /* ignore, dùng fallback */ }
+function fallbackFormat(payload) {
+  if (payload == null) {
+    return { content: "Không có dữ liệu.", format: "plain", suggestions: [] };
+  }
+  if (typeof payload === "string") {
+    return { content: payload, format: "plain", suggestions: [] };
+  }
   try {
-    const base = process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434";
-    const r = await fetch(`${base}/api/tags`, { method: "GET" });
-    if (!r.ok) {
-      const errBody = await r.text();
-      console.error("[Probe] Ollama error body:", errBody);
-      LLM_AVAILABLE = false;
+    return { content: JSON.stringify(payload, null, 2), format: "json", suggestions: [] };
+  } catch {
+    return { content: String(payload), format: "plain", suggestions: [] };
+  }
+}
+
+function formatResponse(data, userPrefs, question, tool, args) {
+  try {
+    if (formatResponseFn) {
+      return formatResponseFn(data, userPrefs, question, tool, args);
     }
   } catch (e) {
-    console.warn("[Probe] Ollama unavailable, fallback regex enabled.");
-    LLM_AVAILABLE = false;
+    console.warn("[Formatter] failed, using fallback:", e?.message || e);
   }
-})(); (async () => {
+  return fallbackFormat(data);
+}
+
+// --- LLM flags ---
+let LLM_AVAILABLE = process.env.USE_LLM !== "0";
+const CONF_TH = Number(process.env.LLM_CONF_THRESHOLD || "0.65");
+
+// Probe Ollama (một lần, không lặp)
+(async () => {
   if (!LLM_AVAILABLE) return;
   try {
     const base = process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434";
@@ -43,6 +77,12 @@ const CONF_TH = Number(process.env.LLM_CONF_THRESHOLD || "0.65");
   }
 })();
 
+// (tuỳ chọn) logger request gọn để debug đường dẫn/method
+router.use((req, _res, next) => {
+  console.log(`[REQ] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 router.post("/chat", async (req, res) => {
   const userQuestion = safeInput(String(req.body?.message ?? "")).slice(0, 1000);
   if (!userQuestion) return res.status(400).json({ error: "Thiếu message" });
@@ -51,9 +91,7 @@ router.post("/chat", async (req, res) => {
   const sessionId =
     req.body?.sessionId || `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   let context = conversationManager.getSession(sessionId);
-  if (!context) {
-    context = conversationManager.createSession(sessionId);
-  }
+  if (!context) context = conversationManager.createSession(sessionId);
 
   // Lưu user message
   conversationManager.addMessage(sessionId, { role: "user", content: userQuestion });
@@ -74,13 +112,13 @@ router.post("/chat", async (req, res) => {
     .test(userQuestion);
   const sess = conversationManager.getSession(sessionId);
 
+  // Chế độ chat tự do
   if ((sess?.mode === "chat" || offDomain) && LLM_AVAILABLE) {
     const history =
       sess?.messages
         ?.filter((m) => m.role === "user" || m.role === "assistant")
         ?.slice(-6)
         ?.map((m) => ({ role: m.role, content: String(m.content || "") })) || [];
-
     try {
       const direct = await llmDirectAnswer(userQuestion, { history });
       conversationManager.addMessage(sessionId, { role: "assistant", content: direct });
@@ -92,13 +130,13 @@ router.post("/chat", async (req, res) => {
     }
   } else if ((sess?.mode === "chat" || offDomain) && !LLM_AVAILABLE) {
     return res.json({
-      reply:
-        "Đang ở chế độ trò chuyện tự do nhưng LLM đang tắt. Dùng /tool để quay về truy vấn dữ liệu.",
+      reply: "Đang ở chế độ trò chuyện tự do nhưng LLM đang tắt. Dùng /tool để quay về truy vấn dữ liệu.",
       sessionId,
       via: "help"
     });
   }
 
+  // ----- Tool inference -----
   let tool = "help";
   let args = {};
   let confidence = 0.0;
@@ -117,10 +155,13 @@ router.post("/chat", async (req, res) => {
         throw new Error("LLM trả về kết quả không hợp lệ");
       }
 
-      // validate (phòng khi callEnhancedLLM thay đổi sau này)
       const v = ToolCallSchema.safeParse(parsed);
       if (!v.success) throw new Error("Tool JSON sai schema");
-      const aa = ArgsSchemas[v.data.tool].safeParse(v.data.args);
+
+      const aa = ArgsSchemas[v.data.tool]?.safeParse
+        ? ArgsSchemas[v.data.tool].safeParse(v.data.args)
+        : { success: true, data: v.data.args };
+
       if (!aa.success) throw new Error("Args sai schema");
 
       tool = v.data.tool;
@@ -138,8 +179,7 @@ router.post("/chat", async (req, res) => {
       args = f.args;
       confidence = 0.6;
     }
-  } catch (err) {
-    // JSON bẩn / ECONNREFUSED / timeout → regex
+  } catch {
     const f = classify(userQuestion);
     tool = f.tool;
     args = f.args;
@@ -148,9 +188,16 @@ router.post("/chat", async (req, res) => {
 
   // 2) Fallback “ChatGPT-style” khi không có tool / tool=help / confidence thấp
   try {
-    const fn = TOOL_REGISTRY[tool];
+    const fn = TOOL_REGISTRY?.[tool];
     const needDirectLLM = tool === "help" || !fn || confidence < CONF_TH;
-    console.log("[Decision]", { tool, hasFn: !!fn, confidence, threshold: CONF_TH, needDirectLLM });
+
+    console.log("[Decision]", {
+      tool,
+      hasFn: !!fn,
+      confidence,
+      threshold: CONF_TH,
+      needDirectLLM
+    });
 
     if (needDirectLLM) {
       if (LLM_AVAILABLE) {
@@ -175,15 +222,14 @@ router.post("/chat", async (req, res) => {
 
         return res.json({
           reply: direct,
-          tool: null, // đã vào direct thì coi như không dùng tool
+          tool: null,
           args,
           confidence,
           sessionId,
           via: "llm-direct"
         });
       } else {
-        // LLM tắt → trả help “mềm”
-        const helpResult = TOOL_REGISTRY.help ? await TOOL_REGISTRY.help({}) : null;
+        const helpResult = TOOL_REGISTRY?.help ? await TOOL_REGISTRY.help({}) : null;
         const helpText =
           typeof helpResult === "string"
             ? helpResult
@@ -195,7 +241,8 @@ router.post("/chat", async (req, res) => {
 - "Tình trạng cả 3 thùng?"
 - "Tổng rác hôm nay?"
 - "Lịch sử 6h thùng kim loại?"
-- "Mở thùng nhựa"`;
+- "Mở thùng nhựa"
+- "Bạn là ai"`;
 
         conversationManager.addMessage(sessionId, { role: "assistant", content: helpText });
         conversationManager.updateContext(sessionId, { lastResponse: helpText });
@@ -207,15 +254,9 @@ router.post("/chat", async (req, res) => {
     const data = await fn(args);
     conversationManager.updateContext(sessionId, { lastData: data });
 
-    // 4) Format câu trả lời (formatter của bạn)
+    // 4) Format câu trả lời
     const userPreferences = conversationManager.detectUserPreferences(sessionId);
-    const formatted = ResponseFormatter.formatResponse(
-      data,
-      userPreferences,
-      userQuestion,
-      tool,
-      args
-    );
+    const formatted = formatResponse(data, userPreferences, userQuestion, tool, args);
 
     conversationManager.addMessage(sessionId, {
       role: "assistant",
@@ -237,6 +278,7 @@ router.post("/chat", async (req, res) => {
       suggestions: formatted.suggestions,
       via: "tool"
     });
+
   } catch (e) {
     console.error("[/chat] exec error:", e);
     const msg = String(e?.message || "");

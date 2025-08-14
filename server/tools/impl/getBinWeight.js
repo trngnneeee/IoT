@@ -1,74 +1,109 @@
+const { getDB } = require("../../services/db"); // hoặc đường dẫn db thực của bạn
 const { getLatestReading } = require("../../services/queries");
+
+const INDEX_BY_BIN = { organic: 1, recyclable: 2, landfill: 3 };
+
+function getBinName(binId) {
+  const names = { organic: "hữu cơ", recyclable: "tái chế", landfill: "chôn lấp" };
+  return names[binId] || binId;
+}
+
+function getStatusFromFill(fillPct) {
+  if (fillPct == null) return "unknown (không biết)";
+  if (fillPct >= 80) return "critical (nguy cấp)";
+  if (fillPct >= 70) return "warning (cảnh báo)";
+  if (fillPct >= 50) return "moderate (vừa phải)";
+  return "good (tốt)";
+}
+
+function getRecommendation(status) {
+  switch (status) {
+    case "critical (nguy cấp)":  return "Cần dọn gấp - thùng đã đầy 80%+";
+    case "warning (cảnh báo)":   return "Cần dọn sớm - thùng đã đầy 70%+";
+    case "moderate (vừa phải)":  return "Thùng đang hoạt động bình thường";
+    case "good (tốt)":      return "Thùng còn nhiều chỗ trống";
+    default:          return "Không có khuyến nghị";
+  }
+}
+
+function generateWeightMessage({ binName, weightKg, dataAge, status }) {
+  if (weightKg == null) return `Không có dữ liệu khối lượng cho thùng ${binName}`;
+
+  let msg = `Thùng ${binName} hiện tại nặng ${weightKg} kg`;
+  if (dataAge) {
+    if (dataAge.isRecent) msg += ` (dữ liệu mới, ${dataAge.hours} giờ trước)`;
+    else if (dataAge.isStale) msg += ` (dữ liệu cũ, ${dataAge.hours} giờ trước)`;
+    else msg += ` (cập nhật ${dataAge.hours} giờ trước)`;
+  }
+  if (status === "critical") msg += `. Cần dọn gấp!`;
+  else if (status === "warning") msg += `. Cần dọn sớm.`;
+  return msg;
+}
+
+async function getLatestWeightsDoc() {
+  const db = await getDB();
+  const col = db.collection("trash-weight");
+  // lấy bản ghi mới nhất
+  return col.find({}).sort({ _id: -1 }).limit(1).next();
+}
 
 async function getBinWeight(args) {
   if (!args || !args.bin) return { error: "Thiếu tham số 'bin'." };
-  
+
+  const bin = String(args.bin);
+  const idx = INDEX_BY_BIN[bin];
+  if (!idx) return { error: `bin không hợp lệ: ${bin}` };
+
   try {
-    const doc = await getLatestReading(args.bin);
-    if (!doc) {
-      return { 
-        bin: args.bin, 
-        binName: getBinName(args.bin),
+    // 1) lấy cân nặng mới nhất từ trash-weight
+    const wdoc = await getLatestWeightsDoc();
+    if (!wdoc) {
+      return {
+        bin,
+        binName: getBinName(bin),
         exists: false,
-        message: `Không có dữ liệu cho thùng ${getBinName(args.bin)}`
+        message: `Không có dữ liệu cân nặng cho thùng ${getBinName(bin)}`
       };
     }
+    const weightKey = `w${idx}`;
+    const weightKg = typeof wdoc[weightKey] === "number" ? Number(wdoc[weightKey]) : null;
+
+    // 2) lấy thông tin % đầy + thời gian từ trash-volume (để có status/recommendation)
+    const volDoc = await getLatestReading(bin); // đã trả về {fillPct, date, dataAge, ...}
+    const fillPct = volDoc?.fillPct ?? null;
+    const status = getStatusFromFill(fillPct);
+    const recommendation = getRecommendation(status);
+
+    // dùng thời gian từ trash-volume (vì trash-weight hiện chưa có 'date')
+    const dataAge = volDoc?.dataAge ?? null;
+    const date = volDoc?.date ?? null;
+
+    const response = {
+      bin,
+      binName: volDoc?.binName || getBinName(bin),
+      exists: true,
+      weightKg,
+      // thông tin kèm theo từ volume
+      fillPct,
+      date,
+      dataAge,
+      status,
+      recommendation,
+    };
 
     return {
-      bin: args.bin,
-      binName: doc.binName || getBinName(args.bin),
-      exists: true,
-      weightKg: typeof doc.weightKg === "number" ? Number(doc.weightKg) : null,
-      createdAt: doc.createdAt,
-      dataAge: doc.dataAge,
-      status: doc.status || 'unknown',
-      recommendation: doc.recommendation || 'Không có khuyến nghị',
-      message: generateWeightMessage(doc)
+      ...response,
+      message: generateWeightMessage(response)
     };
+
   } catch (error) {
     console.error(`Error in getBinWeight for bin ${args.bin}:`, error);
-    return { 
+    return {
       error: "Có lỗi xảy ra khi lấy dữ liệu khối lượng",
-      bin: args.bin,
-      binName: getBinName(args.bin)
+      bin,
+      binName: getBinName(bin)
     };
   }
-}
-
-function getBinName(binId) {
-  const binNames = {
-    "plastic": "nhựa",
-    "organic": "hữu cơ", 
-    "metal": "kim loại",
-    "paper": "giấy"
-  };
-  return binNames[binId] || binId;
-}
-
-function generateWeightMessage(doc) {
-  if (doc.weightKg === null || doc.weightKg === undefined) {
-    return `Không có dữ liệu khối lượng cho thùng ${doc.binName}`;
-  }
-  
-  let message = `Thùng ${doc.binName} hiện tại có khối lượng ${doc.weightKg} kg`;
-  
-  if (doc.dataAge) {
-    if (doc.dataAge.isRecent) {
-      message += ` (dữ liệu mới cập nhật, ${doc.dataAge.hours} giờ trước)`;
-    } else if (doc.dataAge.isStale) {
-      message += ` (dữ liệu cũ, ${doc.dataAge.hours} giờ trước - cần cập nhật)`;
-    } else {
-      message += ` (dữ liệu cập nhật ${doc.dataAge.hours} giờ trước)`;
-    }
-  }
-  
-  if (doc.status === 'critical') {
-    message += `. ⚠️ Thùng đang rất nặng, cần dọn gấp!`;
-  } else if (doc.status === 'warning') {
-    message += `. ⚠️ Thùng đang khá nặng, cần dọn sớm.`;
-  }
-  
-  return message;
 }
 
 module.exports = getBinWeight;

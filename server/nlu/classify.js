@@ -5,11 +5,18 @@ function classify(raw) {
   const t = normalize(raw);
   const bin = mapBin(t);
 
+  // --- quick path: câu hỏi danh tính rất phổ biến ---
+  // Ưu tiên match sớm để khỏi lẫn với nhóm khác
+  const identityQuick = /\b(ban la ai|may la ai|ai vay|who are you|who r u|gioi thieu|introduce yourself|ban ten gi|ten gi|about you|ve ban|mieu ta ban)\b/i;
+  if (identityQuick.test(t)) {
+    return { tool: "who_web", args: {} };
+  }
+
   const patterns = {
     weight: {
       patterns: [
         /(khoi luong|kg|can|nang|trong luong|gam|ton)/,
-        /(bin|thung|thùng).*(bao nhieu|co|dang|hien tai)/,
+        /(bin|thung|thùng).*(bao nhieu|dang|hien tai)/,
         /(bao nhieu|co bao nhieu).*(kg|gam|ton)/
       ],
       tool: "get_bin_weight",
@@ -28,7 +35,8 @@ function classify(raw) {
       patterns: [
         /(tinh trang|status|ca 3 thung|tat ca thung|overview|tong quan)/,
         /(thung nao|bin nao).*(day|con|trong)/,
-        /(tinh hinh|hien trang|overview)/
+        /(tinh hinh|hien trang|overview)/,
+        /(trang thai|status|health)/
       ],
       tool: "get_status_all",
       requiresBin: false
@@ -59,6 +67,26 @@ function classify(raw) {
       tool: "open_bin",
       requiresBin: true
     },
+
+    // NEW: nhận diện danh tính (không cần 'web')
+    identity: {
+      patterns: [
+        /\b(ban la ai|may la ai|ai vay|who are you|who r u|gioi thieu|introduce yourself|ban ten gi|ten gi|about you|ve ban|mieu ta ban)\b/
+      ],
+      tool: "who_web",
+      requiresBin: false
+    },
+
+    // Giữ nhóm whoWeb cũ cho các câu hỏi về WEBSITE
+    whoWeb: {
+      patterns: [
+        /(ai|who|ban la ai).*(web|website|trang web|site)/,
+        /(thong tin|info|information).*(web|website)/
+      ],
+      tool: "who_web",
+      requiresBin: false
+    },
+
     help: {
       patterns: [
         /(giup|help|tro giup|huong dan|lam sao|the nao)/,
@@ -70,69 +98,50 @@ function classify(raw) {
   };
 
   const timePatterns = {
-    "6h": 6,
-    "6 gio": 6,
-    "6 giờ": 6,
-    "12h": 12,
-    "12 gio": 12,
-    "12 giờ": 12,
-    "24h": 24,
-    "24 gio": 24,
-    "24 giờ": 24,
-    "hom nay": 24,
-    "today": 24,
-    "ngay": 24,
-    "tuan": 168,
-    "week": 168,
-    "thang": 720,
-    "month": 720
+    "6h": 6, "6 gio": 6, "6 giờ": 6,
+    "12h": 12, "12 gio": 12, "12 giờ": 12,
+    "24h": 24, "24 gio": 24, "24 giờ": 24,
+    "hom nay": 24, "today": 24, "ngay": 24,
+    "tuan": 168, "week": 168,
+    "thang": 720, "month": 720
   };
 
   let detectedTime = 24;
   for (const [pattern, hours] of Object.entries(timePatterns)) {
-    if (t.includes(pattern)) {
-      detectedTime = hours;
-      break;
-    }
+    if (t.includes(pattern)) { detectedTime = hours; break; }
   }
 
   const binSynonyms = {
-    plastic: ["nhua", "nhựa", "plastic", "chai", "lon", "nilon"],
     organic: ["huu co", "hữu cơ", "organic", "thuc pham", "thực phẩm", "rau", "cu"],
-    metal: ["kim loai", "kim loại", "metal", "sat", "sắt", "nhom", "nhôm", "lon", "can"],
-    paper: ["giay", "giấy", "paper", "bao", "sach", "sách", "cardboard"]
+    recyclable: ["tai che", "tái chế", "giay", "lon", "vo lon", "bia carton"],
+    landfill: ["chon lap", "chôn lấp", "rac", "rác sinh hoạt", "trash", "khau trang"]
   };
 
   let detectedBin = bin;
   if (!detectedBin) {
     for (const [binType, synonyms] of Object.entries(binSynonyms)) {
-      if (synonyms.some(syn => t.includes(syn))) {
-        detectedBin = binType;
-        break;
-      }
+      if (synonyms.some(syn => t.includes(syn))) { detectedBin = binType; break; }
     }
   }
 
+  // Chấm "confidence" đơn giản bằng độ dài pattern, giữ nguyên ý tưởng cũ
   let bestMatch = { tool: "help", args: {}, confidence: 0 };
 
   for (const [category, config] of Object.entries(patterns)) {
     for (const pattern of config.patterns) {
       if (pattern.test(t)) {
-        const confidence = pattern.source.length;
-
+        const confidence = pattern.source.length + (category === "identity" ? 1000 : 0); // ưu tiên identity
         if (confidence > bestMatch.confidence) {
           let args = {};
-
           if (config.tool === "get_bin_weight" || config.tool === "get_bin_fill") {
-            args = { bin: detectedBin || "plastic" };
+            args = { bin: detectedBin || "organic" };
           } else if (config.tool === "get_summary") {
             args = { windowHours: detectedTime };
           } else if (config.tool === "get_history") {
-            args = { bin: detectedBin || "plastic", windowHours: detectedTime };
+            args = { bin: detectedBin || "organic", windowHours: detectedTime };
           } else if (config.tool === "open_bin") {
-            args = { bin: detectedBin || "plastic" };
+            args = { bin: detectedBin || "organic" };
           }
-
           bestMatch = { tool: config.tool, args, confidence };
         }
       }
@@ -142,7 +151,6 @@ function classify(raw) {
   if (bestMatch.confidence === 0) {
     return { tool: "help", args: {} };
   }
-
   return { tool: bestMatch.tool, args: bestMatch.args };
 }
 

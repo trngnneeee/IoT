@@ -6,7 +6,7 @@ let _db = null;
 async function getDB() {
   if (_db) return _db;
   const url = process.env.MONGO_URL;
-  const name = process.env.DB_NAME || "garbage_ai";
+  const name = process.env.DB_NAME || "IoT_Web";
   if (!url) throw new Error("MONGO_URL missing in .env");
   const client = new MongoClient(url);
   await client.connect();

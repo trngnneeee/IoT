@@ -10,8 +10,8 @@ const indexRoute = require("./router/index.route");
 const chatRoute = require("./router/chat.route");
 
 mongoose.connect(process.env.DATABASE)
-  .then(() => console.log('✅ Connected to MongoDB'))
-  .catch((err) => console.error('❌ MongoDB connection error:', err));
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('MongoDB connection error:', err));
 
 app.use(express.json());
 app.use(cookieParser());

@@ -1,9 +1,8 @@
 function mapBin(normText) {
   const pairs = [
-    ["plastic", ["nhua", "plastic", "pet", "chai"]],
     ["organic", ["huu co", "organic", "food", "thuc an", "do an"]],
-    ["metal",   ["kim loai", "metal", "lon", "vo lon", "nhom", "sat", "thep"]],
-    ["paper",   ["giay", "paper", "thung giay", "vo hop giay"]]
+    ["recyclable", ["tai che", "recyclable", "giay", "lon", "vo lon", "bia carton"]],
+    ["landfill", ["chon lap", "landfill", "rac", "rac sinh hoat", "trash", "khau trang"]]
   ];
   
   for (const [id, keys] of pairs) {

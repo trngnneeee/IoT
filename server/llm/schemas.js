@@ -1,7 +1,7 @@
 // src/llm/schemas.js
 const { z } = require("zod");
 
-const BinEnum = z.enum(["plastic", "organic", "metal", "paper"]);
+const BinEnum = z.enum(["organic", "recyclable", "landfill"]);
 
 const ToolName = z.enum([
   "get_bin_weight",

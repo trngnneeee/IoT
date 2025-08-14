@@ -12,10 +12,16 @@ const BASE = process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434";
  */
 async function generateAnswer(params) {
   const { userQuestion, tool, args, data } = params;
+  if (data && typeof data === 'object' && data.message
+    && !wantsJSON && !wantsCSV && !wantsTable && !wantsChart) {
+    return String(data.message); // trả nguyên văn message
+  }
 
   const SYSTEM = `
 Bạn là trợ lý AI thông minh cho hệ thống IoT phân loại rác thông minh. 
 Mục tiêu: tạo câu trả lời tự nhiên, hữu ích, và chính xác dựa trên dữ liệu thực tế.
+NẾU DATA có trường message TRẢ LỜI NGUYÊN VĂN đúng message và KHÔNG thêm gì khác.
+Chỉ khi KHÔNG có message mới tổng hợp câu trả lời theo quy tắc.
 
 QUY TẮC TRẢ LỜI:
 1. NGÔN NGỮ: Luôn trả lời bằng tiếng Việt tự nhiên, thân thiện
@@ -26,10 +32,9 @@ QUY TẮC TRẢ LỜI:
 6. THỜI GIAN: Ghi rõ thời điểm dữ liệu được cập nhật
 
 CÁC LOẠI THÙNG:
-- Plastic (Nhựa): chai, lon, nilon, bao bì
-- Organic (Hữu cơ): thực phẩm, rau củ, thức ăn thừa
-- Metal (Kim loại): sắt, nhôm, lon, can
-- Paper (Giấy): giấy, báo, sách, bìa carton
+- Rác hữu cơ (Organic): Thức ăn thừa, lá cây, vỏ trái cây, … 
+- Rác tái chế (Recyclable): Giấy, chai nhựa, mảnh thủy tinh, báo, … 
+- Rác chôn lấp (Landfill): Rác khó tái chế, rác thải sinh hoạt, rác thải nhựa, bã kẹo, … 
 
 XỬ LÝ DỮ LIỆU:
 - Nếu thiếu dữ liệu: "Chưa có dữ liệu cho [thùng/thời gian]"
@@ -68,6 +73,10 @@ BỐI CẢNH BỔ SUNG:
     contextHints.push("Đây là tổng kết theo thời gian. Hãy giải thích ý nghĩa của các con số.");
   } else if (tool === "get_history") {
     contextHints.push("Đây là dữ liệu lịch sử. Hãy phân tích xu hướng và thay đổi theo thời gian.");
+  } else if (tool === "open_bin") {
+    contextHints.push("Đây là thông tin về việc mở thùng rác. Hãy cung cấp hướng dẫn chi tiết.");
+  } else if (tool == "whoWeb"){
+    contextHints.push("Đây là thông tin về sản phẩm chat bot này. Đây là sản phẩm do nhóm gồm các thành viên 23127181-23127207-23127438.");
   }
 
   const USER = `
@@ -89,6 +98,7 @@ HƯỚNG DẪN:
 - Bổ sung thông tin hữu ích khi có thể
 - Nếu có lỗi hoặc thiếu dữ liệu, giải thích rõ ràng
 - Luôn ghi rõ đơn vị và thời gian
+- Nếu có thể, so sánh giữa các thùng hoặc giải thích ý nghĩa của số liệu
 `;
 
   try {
@@ -131,7 +141,7 @@ function generateFallbackResponse(userQuestion, tool, args, data) {
     switch (tool) {
       case "get_bin_weight":
         if (data.exists && data.weightKg !== null) {
-          response = `Thùng ${getBinName(args.bin)} hiện tại có khối lượng ${data.weightKg} kg. Dữ liệu cập nhật lần cuối: ${formatTime(data.createdAt)}.`;
+          response = `Thùng ${getBinName(args.bin)} hiện tại có khối lượng ${String(data.weightKg)} kg. Dữ liệu cập nhật lần cuối: ${formatTime(data.createdAt)}.`;
         } else {
           response = `Không có dữ liệu khối lượng cho thùng ${getBinName(args.bin)}.`;
         }
@@ -157,14 +167,16 @@ function generateFallbackResponse(userQuestion, tool, args, data) {
         break;
         
       case "get_summary":
+        console.log("getSummary: data", data);
         if (Array.isArray(data) && data.length > 0) {
           response = `Tổng kết ${args.windowHours || 24} giờ qua:\n`;
           data.forEach((item) => {
-            response += `- Thùng ${getBinName(item._id)}: ${item.weightKg || 0} kg\n`;
+            response += `- Thùng ${getBinName(item._id)}: ${String(item.weightKg || 0)} kg\n`;
           });
         } else {
           response = `Không có dữ liệu tổng kết cho ${args.windowHours || 24} giờ qua.`;
         }
+        
         break;
         
       case "get_history":
@@ -181,12 +193,16 @@ function generateFallbackResponse(userQuestion, tool, args, data) {
         } else {
           response = `Không có dữ liệu lịch sử cho thùng ${getBinName(args.bin)} trong ${args.windowHours || 24} giờ qua.`;
         }
+        console.log("getHistory: response", response);
+        response = data.message || response;
         break;
         
       case "open_bin":
         response = `Đã gửi lệnh mở thùng ${getBinName(args.bin)}. Thùng sẽ mở trong vài giây.`;
         break;
-        
+      case "whoWeb":
+        response = "Đây là sản phẩm chat bot do nhóm gồm các thành viên 23127181-23127207-23127438. Sử dụng chat bot để tăng trải nghiệm cho người dùng.";
+        break;
       default:
         response = "Tôi đã xử lý yêu cầu của bạn. Nếu cần thêm thông tin, hãy hỏi cụ thể hơn.";
     }
@@ -202,10 +218,9 @@ function generateFallbackResponse(userQuestion, tool, args, data) {
  */
 function getBinName(binId) {
   const binNames = {
-    "plastic": "nhựa",
     "organic": "hữu cơ", 
-    "metal": "kim loại",
-    "paper": "giấy"
+    "Recyclable": "tái chế",
+    "Landfill": "chôn lấp"
   };
   return binNames[binId] || binId;
 }

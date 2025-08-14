@@ -96,7 +96,7 @@ class ResponseFormatter {
 
       case 'get_bin_fill':
         content = this.formatFillResponse(data, preferences.language);
-        if (data.percentage > 80) {
+        if (data.percentage > 70) {
           suggestions.push('Thùng này đã gần đầy, cần dọn dẹp sớm!');
         }
         suggestions.push('Xem khối lượng thực tế?');
@@ -151,39 +151,64 @@ class ResponseFormatter {
 
   static formatWeightResponse(data, language) {
     if (language === 'vi') {
-      return `Thùng ${data.bin} hiện tại có khối lượng ${data.weight}kg. ${this.getWeightContext(data.weight)}`;
+      return `Thùng ${data.bin} hiện tại có khối lượng ${String(data.weightKg)}kg. ${this.getWeightContext(data.weightKg)}`;
     }
-    return `The ${data.bin} bin currently weighs ${data.weight}kg. ${this.getWeightContext(data.weight)}`;
+    return `The ${data.bin} bin currently weighs ${String(data.weightKg)}kg. ${this.getWeightContext(data.weightKg)}`;
   }
 
   static formatFillResponse(data, language) {
     if (language === 'vi') {
-      return `Thùng ${data.bin} đang đầy ${data.percentage}%. ${this.getFillContext(data.percentage)}`;
+      return `Thùng ${data.bin} đang đầy ${String(data.fillPct)}%. ${this.getFillContext(data.fillPct)}`;
     }
-    return `The ${data.bin} bin is ${data.percentage}% full. ${this.getFillContext(data.percentage)}`;
+    return `The ${data.bin} bin is ${String(data.fillPct)}% full. ${this.getFillContext(data.fillPct)}`;
   }
 
   static formatStatusResponse(data, language) {
-    if (language === 'vi') {
-      return `Tình trạng các thùng:\n${data.map((bin) => 
-        `• ${bin.bin}: ${bin.weight}kg (${bin.percentage}% đầy)`
-      ).join('\n')}`;
+    if (!data || !Array.isArray(data.summary)) {
+      return language === 'vi'
+        ? "Không có dữ liệu về tình trạng thùng rác."
+        : "No bin status data available.";
     }
-    return `Bin status:\n${data.map((bin) => 
-      `• ${bin.bin}: ${bin.weight}kg (${bin.percentage}% full)`
-    ).join('\n')}`;
+
+    const items = data.summary;
+
+    if (language === 'vi') {
+      return (
+        `Tình trạng các thùng:\n` +
+        items.map(bin => {
+          const pct = (bin.fillPct != null) ? `${bin.fillPct}%` : "Không rõ";
+          const name = bin.binName || bin.bin;
+          const status = bin.status || "không rõ";
+          return `• ${name}: ${pct} đầy (${status})`;
+        }).join('\n')
+      );
+    }
+
+    // English
+    return (
+      `Bin status:\n` +
+      items.map(bin => {
+        const pct = (bin.fillPct != null) ? `${bin.fillPct}%` : "N/A";
+        const name = bin.binName || bin.bin;
+        const status = bin.status || "unknown";
+        return `• ${name}: ${pct} full (${status})`;
+      }).join('\n')
+    );
   }
 
-  static formatSummaryResponse(data, language) {
+
+
+  static formatSummaryResponse(args, data, language) {
     if (language === 'vi') {
-      return `Tổng kết ${data.windowHours} giờ qua: ${data.totalWeight}kg rác được thu gom. ${this.getSummaryContext(data)}`;
+      console.log("getSummary1: data", data);
+      return `Tổng kết ${args.windowHours || 24} giờ qua: ${String(data.weight.total)}kg rác được thu gom. ${this.getSummaryContext(data)}`;
     }
-    return `Summary for the last ${data.windowHours} hours: ${data.totalWeight}kg of waste collected. ${this.getSummaryContext(data)}`;
+    return `Summary for the last ${args.windowHours || 24} hours: ${String(data.weight.total)}kg of waste collected. ${this.getSummaryContext(data)}`;
   }
 
   static formatHistoryResponse(data, language) {
     if (language === 'vi') {
-      return `Lịch sử thùng ${data.bin} trong ${data.windowHours} giờ qua: ${data.length} bản ghi. ${this.getHistoryContext(data)}`;
+      return data;
     }
     return `History for ${data.bin} bin over the last ${data.windowHours} hours: ${data.length} records. ${this.getHistoryContext(data)}`;
   }
@@ -216,9 +241,9 @@ class ResponseFormatter {
   }
 
   static getFillContext(percentage) {
-    if (percentage > 90) return 'Thùng đã gần đầy hoàn toàn!';
-    if (percentage > 80) return 'Thùng đã khá đầy, cần chú ý.';
-    if (percentage > 60) return 'Thùng đã đầy hơn một nửa.';
+    if (percentage > 80) return 'Thùng đã gần đầy hoàn toàn!';
+    if (percentage > 70) return 'Thùng đã khá đầy, cần chú ý.';
+    if (percentage > 50) return 'Thùng đã đầy hơn một nửa.';
     if (percentage > 30) return 'Thùng đã có một lượng rác đáng kể.';
     return 'Thùng còn nhiều chỗ trống.';
   }
@@ -346,7 +371,9 @@ class ResponseFormatter {
 
 // Export để sử dụng trong Node.js (nếu cần)
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = ResponseFormatter;
+   // Export cả default lẫn named để import kiểu nào cũng chạy
+   module.exports = ResponseFormatter;
+   module.exports.ResponseFormatter = ResponseFormatter;
+   module.exports.formatResponse = ResponseFormatter.formatResponse;
+   module.exports.detectRequestedFormat = ResponseFormatter.detectRequestedFormat;
 }
-
-// Hoặc trong browser có thể sử dụng trực tiếp class ResponseFormatter
