@@ -13,6 +13,7 @@ const { callEnhancedLLM, llmDirectAnswer } = require("../llm/enhanced-ollama");
 const { ToolCallSchema, ArgsSchemas } = require("../llm/schemas");
 const { conversationManager } = require("../utils/conversation");
 const fetch = require("node-fetch");
+const ChatHistory = require('../model/chat-history.model');
 
 // --- Formatter: tự tìm formatResponse hoặc ResponseFormatter.formatResponse, có fallback ---
 let formatResponseFn = null;
@@ -79,7 +80,7 @@ const CONF_TH = Number(process.env.LLM_CONF_THRESHOLD || "0.65");
 
 // (tuỳ chọn) logger request gọn để debug đường dẫn/method
 router.use((req, _res, next) => {
-  console.log(`[REQ] ${req.method} ${req.originalUrl}`);
+  // console.log(`[REQ] ${req.method} ${req.originalUrl}`);
   next();
 });
 
@@ -267,16 +268,46 @@ router.post("/chat", async (req, res) => {
     });
     conversationManager.updateContext(sessionId, { lastResponse: formatted.content });
 
+    // Lưu dữ liệu cuộc nói chuyện
+    const chatHistory = await ChatHistory.findOne({
+      userID: req.account.id
+    });
+    if (chatHistory) {
+      const newChat = [
+        {
+          id: 1,
+          chat: req.body.message
+        },
+        {
+          id: 2,
+          chat: formatted.content
+        }
+      ];
+
+      chatHistory.chat.push(...newChat);
+      await chatHistory.save();
+    }
+    else {
+      const newChatRecord = new ChatHistory({
+        userID: req.account.id,
+        chat: [
+          {
+            id: 1,
+            chat: req.body.message
+          },
+          {
+            id: 2,
+            chat: formatted.content
+          }
+        ]
+      });
+      await newChatRecord.save();
+    }
+
     return res.json({
-      reply: formatted.content,
-      tool,
-      args,
-      data,
-      confidence,
-      sessionId,
-      format: formatted.format,
-      suggestions: formatted.suggestions,
-      via: "tool"
+      code: "success",
+      message: "Chat successfully!",
+      reply: formatted.content
     });
 
   } catch (e) {
@@ -312,5 +343,16 @@ router.post("/preferences/:sessionId", (req, res) => {
 setInterval(() => {
   conversationManager.cleanup();
 }, 5 * 60 * 1000); // 5 phút
+
+router.get("/chat-history", async (req, res) => {
+  const chatHistory = await ChatHistory.findOne({
+    userID: req.account.id
+  });
+  res.json({
+    code: "success",
+    message: "Get chat history successfully!",
+    chatHistory: chatHistory
+  })
+})
 
 module.exports = router;

@@ -31,7 +31,7 @@ export const Sider = () => {
 
   return (
     <>
-      <div className="bg-white w-[300px] h-full fixed t-0 shadow-2xl" data-aos="fade-right">
+      <div className="bg-white w-[300px] h-full fixed t-0 shadow-2xl z-99" data-aos="fade-right">
         <div className="w-full h-auto px-[50px] mt-[20px] mb-[50px] cursor-pointer" onClick={() => { router.push("/") }}>
           <img src="/logo.jpg" className="w-full h-full object-cover" />
         </div>
