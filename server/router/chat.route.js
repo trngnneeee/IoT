@@ -84,6 +84,43 @@ router.use((req, _res, next) => {
   next();
 });
 
+const saveChatHistory = async (userChat, botChat, userID) => {
+  const chatHistory = await ChatHistory.findOne({
+    userID: userID
+  });
+  if (chatHistory) {
+    const newChat = [
+      {
+        id: 1,
+        chat: userChat
+      },
+      {
+        id: 2,
+        chat: botChat
+      }
+    ];
+
+    chatHistory.chat.push(...newChat);
+    await chatHistory.save();
+  }
+  else {
+    const newChatRecord = new ChatHistory({
+      userID: userID,
+      chat: [
+        {
+          id: 1,
+          chat: userChat
+        },
+        {
+          id: 2,
+          chat: botChat
+        }
+      ]
+    });
+    await newChatRecord.save();
+  }
+}
+
 router.post("/chat", async (req, res) => {
   const userQuestion = safeInput(String(req.body?.message ?? "")).slice(0, 1000);
   if (!userQuestion) return res.status(400).json({ error: "Thiếu message" });
@@ -221,13 +258,12 @@ router.post("/chat", async (req, res) => {
         conversationManager.addMessage(sessionId, { role: "assistant", content: direct });
         conversationManager.updateContext(sessionId, { lastResponse: direct });
 
+        saveChatHistory(req.body.message, direct, req.account.id);
+
         return res.json({
+          code: "success",
+          message: "Chat successfully!",
           reply: direct,
-          tool: null,
-          args,
-          confidence,
-          sessionId,
-          via: "llm-direct"
         });
       } else {
         const helpResult = TOOL_REGISTRY?.help ? await TOOL_REGISTRY.help({}) : null;
@@ -268,41 +304,7 @@ router.post("/chat", async (req, res) => {
     });
     conversationManager.updateContext(sessionId, { lastResponse: formatted.content });
 
-    // Lưu dữ liệu cuộc nói chuyện
-    const chatHistory = await ChatHistory.findOne({
-      userID: req.account.id
-    });
-    if (chatHistory) {
-      const newChat = [
-        {
-          id: 1,
-          chat: req.body.message
-        },
-        {
-          id: 2,
-          chat: formatted.content
-        }
-      ];
-
-      chatHistory.chat.push(...newChat);
-      await chatHistory.save();
-    }
-    else {
-      const newChatRecord = new ChatHistory({
-        userID: req.account.id,
-        chat: [
-          {
-            id: 1,
-            chat: req.body.message
-          },
-          {
-            id: 2,
-            chat: formatted.content
-          }
-        ]
-      });
-      await newChatRecord.save();
-    }
+    saveChatHistory(req.body.message, formatted.content, req.account.id);
 
     return res.json({
       code: "success",
